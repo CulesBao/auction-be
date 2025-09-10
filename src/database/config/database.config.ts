@@ -1,4 +1,7 @@
 import { registerAs } from '@nestjs/config';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 import { DatabaseConfig } from './database-config.type';
 export default registerAs<DatabaseConfig>('', () => {

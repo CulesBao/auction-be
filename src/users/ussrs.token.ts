@@ -1,0 +1,3 @@
+export const USERS_TOKEN = {
+    REPOSITORY: 'USERS_REPOSITORY',
+}

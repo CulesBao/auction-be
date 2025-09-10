@@ -1,8 +1,11 @@
 import 'reflect-metadata';
 import { DataSource, DataSourceOptions } from 'typeorm';
+import * as dotenv from 'dotenv';
+
+dotenv.config();
 
 export const AppDataSource = new DataSource({
-    type: process.env.DATABASE_TYPE,
+    type: process.env.DATABASE_TYPE as any,
     host: process.env.DATABASE_HOST,
     port: process.env.DATABASE_PORT
         ? parseInt(process.env.DATABASE_PORT, 10)
@@ -11,7 +14,7 @@ export const AppDataSource = new DataSource({
     password: process.env.DATABASE_PASSWORD,
     database: process.env.DATABASE_NAME,
     synchronize: process.env.DATABASE_SYNCHRONIZE === 'true',
-    logging: process.env.NODE_ENV !== 'production',
+    logging: false,
     entities: [__dirname + '/../**/**/*.entity{.ts,.js}'],
     migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
 } as DataSourceOptions);
