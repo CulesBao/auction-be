@@ -10,10 +10,10 @@ async function bootstrap() {
   });
 
   const config = new DocumentBuilder()
-    .setTitle('SAGSINs APIs')
-    .setDescription('The SAGSINs API description')
+    .setTitle('Auction APIs')
+    .setDescription('The Auction API description')
     .setVersion('1.0')
-    .addTag('sagsins')
+    .addTag('Auction')
     .build();
   const documentFactory = () => SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, documentFactory);
