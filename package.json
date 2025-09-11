@@ -23,7 +23,7 @@
     "typeorm": "typeorm-ts-node-commonjs",
     "typeorm:run": "npm run typeorm migration:run -- -d ./src/database/data-source.ts",
     "typeorm:generate": "npm run typeorm -- -d ./src/database/data-source.ts migration:generate",
-    "typeorm:create-migration": "npm run typeorm -- migration:create ./src/database/migrations/NewMigration",
+    "typeorm:create-migration": "npm run typeorm -- migration:create ./src/database/migrations/",
     "typeorm:revert-migration": "npm run typeorm -- -d ./src/database/data-source.ts migration:revert"
   },
   "dependencies": {
