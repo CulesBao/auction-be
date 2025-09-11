@@ -33,4 +33,4 @@ import { CqrsModule } from '@nestjs/cqrs';
     UsersModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}
