@@ -22,7 +22,7 @@ export class CreateUserCommandHandler
             throw new ConflictException('User with this email already exists');
         }
 
-        const user = UserMapper.toUser({
+        const user = UserMapper.toDomain({
             name,
             email,
             password: await bcrypt.hash(password, this.saltRounds),

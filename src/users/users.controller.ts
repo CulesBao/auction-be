@@ -22,7 +22,7 @@ export class UsersController {
     @Body(new ValidationPipe()) createUserDto: CreateUserDto,
   ): Promise<void> {
     await this.commandBus.execute(
-      UserMapper.toCreateUserCommand(createUserDto),
+      UserMapper.fromCreateUserDto(createUserDto),
     );
   }
 }

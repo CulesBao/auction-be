@@ -1,10 +1,10 @@
 import { CreateUserDto } from '../dto/create-user.dto';
 import { CreateUserCommand } from '../cqrs/commands/handlers/create-user.command.handler';
 import { User } from '../domain/user';
-import { uuid } from 'uuidv4';
+import { v4 } from 'uuid';
 
 export class UserMapper {
-    static toCreateUserCommand(dto: CreateUserDto): CreateUserCommand {
+    static fromCreateUserDto(dto: CreateUserDto): CreateUserCommand {
         return new CreateUserCommand(
             dto.name,
             dto.email,
@@ -12,14 +12,14 @@ export class UserMapper {
         );
     }
 
-    static toUser(command: CreateUserCommand): User {
-        return new User(
-            uuid(),
-            command.name,
-            command.email,
-            command.password,
-            new Date(),
-            new Date(),
-        );
+    static toDomain(command: CreateUserCommand): User {
+        return {
+            id: v4(),
+            name: command.name,
+            email: command.email,
+            password: command.password,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+        } as User;
     }
 }

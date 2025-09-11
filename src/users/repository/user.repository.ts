@@ -3,28 +3,28 @@ import { User } from '../domain/user';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserEntity } from '../entities/user.entity';
 import { Repository } from 'typeorm';
-import { UUID } from 'typeorm/driver/mongodb/bson.typings';
+import { UUID } from 'crypto';
 
 @Injectable()
 export class UserRepository {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-  ) {}
+  ) { }
 
   async create(user: User): Promise<UserEntity> {
-    const userEntity = this.userRepository.create(user);
-    await this.userRepository.save(userEntity);
-    return userEntity;
+    return await this.userRepository.save(
+      this.userRepository.create(user)
+    );
   }
 
   async findAll(): Promise<UserEntity[]> {
     return this.userRepository.find();
   }
 
-  async findById(id: string): Promise<UserEntity | null> {
+  async findById(id: UUID): Promise<UserEntity | null> {
     return this.userRepository.findOneBy({
-      id: new UUID(id),
+      id,
     });
   }
 
@@ -41,7 +41,8 @@ export class UserRepository {
   async update(user: User): Promise<void> {
     await this.userRepository.save(user);
   }
-  async delete(id: string): Promise<void> {
+
+  async delete(id: UUID): Promise<void> {
     await this.userRepository.delete(id);
   }
 }
