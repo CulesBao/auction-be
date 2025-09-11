@@ -5,7 +5,7 @@ import databaseConfig from './database/config/database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmConfigService } from './database/typeorm-config.service';
 import { DataSource, DataSourceOptions } from 'typeorm';
-import { UsersModule } from './users/users.module';
+import { UsersModule } from './modules/users/users.module';
 import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({

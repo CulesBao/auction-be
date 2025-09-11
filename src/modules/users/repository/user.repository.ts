@@ -10,12 +10,10 @@ export class UserRepository {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-  ) { }
+  ) {}
 
-  async create(user: User): Promise<UserEntity> {
-    return await this.userRepository.save(
-      this.userRepository.create(user)
-    );
+  async create(user: Partial<User>): Promise<UserEntity> {
+    return await this.userRepository.save(this.userRepository.create(user));
   }
 
   async findAll(): Promise<UserEntity[]> {
