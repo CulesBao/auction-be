@@ -5,6 +5,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { UserMapper } from './mappers/user.mapper';
 import { GetUserByIdResponseDto } from './dto/get-user-by-id.response.dto';
 import { GetUserByIdQuery } from './cqrs/queries/implements/get-user-by-id.query';
+import { UUID } from 'crypto';
 
 @ApiTags('users')
 @Controller('users')
@@ -35,9 +36,8 @@ export class UsersController {
   })
   @ApiResponse({ status: 404, description: 'User not found.' })
   async getById(
-    @Param('userId') userId: string,
+    @Param('userId') userId: UUID,
   ): Promise<GetUserByIdResponseDto> {
-    console.log('Fetching user with ID:', userId);
     return await this.queryBus.execute(new GetUserByIdQuery(userId));
   }
 }
