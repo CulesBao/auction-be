@@ -1,34 +1,11 @@
-import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CreateUserCommand } from '../handlers/create-user.command.handler';
-import { ConflictException, Inject } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { UserRepository } from 'src/modules/users/repository/user.repository';
-import { UserMapper } from 'src/modules/users/mappers/user.mapper';
+import { ICommand } from '@nestjs/cqrs';
 
-@CommandHandler(CreateUserCommand)
-export class CreateUserCommandHandler
-  implements ICommandHandler<CreateUserCommand>
-{
-  private readonly saltRounds = 10;
+export class CreateUserCommand implements ICommand {
   constructor(
-    @Inject(UserRepository)
-    private readonly userRepository: UserRepository,
+    public readonly name: string,
+
+    public readonly email: string,
+
+    public readonly password: string,
   ) {}
-
-  async execute(command: CreateUserCommand): Promise<void> {
-    const { name, email, password } = command;
-
-    const isExistingUser = await this.userRepository.existBy(email);
-    if (isExistingUser) {
-      throw new ConflictException('User with this email already exists');
-    }
-
-    const user = UserMapper.toDomain({
-      name,
-      email,
-      password: await bcrypt.hash(password, this.saltRounds),
-    });
-
-    await this.userRepository.create(user);
-  }
 }

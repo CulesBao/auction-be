@@ -1,5 +1,5 @@
 import { CreateUserDto } from '../dto/create-user.dto';
-import { CreateUserCommand } from '../cqrs/commands/handlers/create-user.command.handler';
+import { CreateUserCommand } from '../cqrs/commands/implements/create-user.command';
 import { User } from '../domain/user';
 
 export class UserMapper {
