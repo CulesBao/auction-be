@@ -5,6 +5,8 @@ import databaseConfig from './database/config/database.config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { TypeOrmConfigService } from './database/typeorm-config.service';
 import { DataSource, DataSourceOptions } from 'typeorm';
+import { UsersModule } from './modules/users/users.module';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
   imports: [
@@ -21,12 +23,14 @@ import { DataSource, DataSourceOptions } from 'typeorm';
         },
       ],
     }),
+    CqrsModule.forRoot(),
     TypeOrmModule.forRootAsync({
       useClass: TypeOrmConfigService,
       dataSourceFactory: async (options: DataSourceOptions) => {
         return new DataSource(options).initialize();
       },
-    })
+    }),
+    UsersModule,
   ],
 })
-export class AppModule { }
+export class AppModule {}
