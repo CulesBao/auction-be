@@ -16,23 +16,21 @@ export class CreateItemCommandHandler
   ) {}
 
   async execute(command: CreateItemCommand): Promise<void> {
-    const { ownerId, ...rest } = command;
-
     if (command.startTime >= command.endTime) {
       throw new BadRequestException({
         description: 'Start time must be before end time',
       });
     }
 
-    const user = await this.userRepository.findById(ownerId);
+    const user = await this.userRepository.findById(command.ownerId);
     if (!user) {
       throw new NotFoundException({
-        description: `User with ID ${ownerId} not found`,
+        description: `User with ID ${command.ownerId} not found`,
       });
     }
 
     await this.itemRepository.create({
-      ...rest,
+      ...command,
       owner: user,
     });
   }

@@ -1,6 +1,12 @@
 import { UUID } from 'crypto';
 import { UserEntity } from '../../users/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity('items')
 export class ItemEntity {
@@ -13,8 +19,12 @@ export class ItemEntity {
   @Column({ nullable: false, type: 'text' })
   description: string;
 
-  @ManyToOne(() => UserEntity, (user) => user.items, { nullable: false })
+  @ManyToOne(() => UserEntity, (user) => user.items, { cascade: true })
+  @JoinColumn({ name: 'ownerId' })
   owner: UserEntity;
+
+  @Column({ type: 'uuid', nullable: false })
+  ownerId: UUID;
 
   @Column({ nullable: false, type: 'decimal' })
   startingPrice: number;
@@ -25,8 +35,12 @@ export class ItemEntity {
   @Column({ nullable: false, type: 'timestamp' })
   endTime: Date;
 
-  @ManyToOne(() => UserEntity, { nullable: true })
-  winner: UserEntity | null;
+  @ManyToOne(() => UserEntity, { cascade: true })
+  @JoinColumn({ name: 'winnerId' })
+  winner: UserEntity;
+
+  @Column({ type: 'uuid', nullable: true })
+  winnerId: UUID | null;
 
   @Column({ type: 'decimal', nullable: true })
   finalPrice: number | null;
