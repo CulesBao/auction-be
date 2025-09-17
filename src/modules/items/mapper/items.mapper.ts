@@ -1,5 +1,5 @@
 import { CreateItemCommand } from '../cqrs/commands/implements/create-item.command';
-import { CreateItemDto } from '../dto/create-item.dto';
+import { CreateItemDto } from '../dto/request/create-item.request.dto';
 
 export class ItemsMapper {
   static fromCreateItemDto(dto: CreateItemDto): CreateItemCommand {

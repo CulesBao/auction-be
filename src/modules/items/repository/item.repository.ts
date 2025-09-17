@@ -16,4 +16,8 @@ export class ItemRepository {
   async findById(id: UUID): Promise<ItemEntity | null> {
     return await this.itemRepository.findOneBy({ id });
   }
+
+  async findByOwnerId(ownerId: UUID): Promise<ItemEntity[]> {
+    return await this.itemRepository.findBy({ ownerId });
+  }
 }

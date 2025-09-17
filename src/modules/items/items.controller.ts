@@ -1,11 +1,19 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
-import { CreateItemDto } from './dto/create-item.dto';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  ParseUUIDPipe,
+} from '@nestjs/common';
+import { CreateItemDto } from './dto/request/create-item.request.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ItemsMapper } from './mapper/items.mapper';
-import { GetItemByIdResponseDto } from './dto/get-item-by-id.response.dto';
+import { GetItemByIdResponseDto } from './dto/response/get-item-by-id.response.dto';
 import { UUID } from 'crypto';
 import { GetItemByIdQuery } from './cqrs/queries/implements/get-item-by-id.query';
+import { GetItemsByOwnerIdQuery } from './cqrs/queries/implements/get-items-by-owner-id.query';
 
 @Controller('items')
 @ApiTags('items')
@@ -36,7 +44,18 @@ export class ItemsController {
     type: GetItemByIdResponseDto,
   })
   @ApiResponse({ status: 404, description: 'Item not found.' })
-  getItemById(@Param('id') id: UUID) {
+  getItemById(@Param('id', ParseUUIDPipe) id: UUID) {
     return this.queryBus.execute(new GetItemByIdQuery(id));
+  }
+
+  @Get('owner/:ownerId')
+  @ApiOperation({ summary: 'Get items by owner ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'The items have been successfully retrieved.',
+    type: [GetItemByIdResponseDto],
+  })
+  getItemsByOwnerId(@Param('ownerId', ParseUUIDPipe) ownerId: UUID) {
+    return this.queryBus.execute(new GetItemsByOwnerIdQuery(ownerId));
   }
 }

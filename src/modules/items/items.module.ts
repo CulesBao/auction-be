@@ -7,9 +7,10 @@ import { CreateItemCommandHandler } from './cqrs/commands/handlers/create-item.c
 import { ItemRepository } from './repository/item.repository';
 import { UsersModule } from '../users/users.module';
 import { GetItemByIdQueryHandler } from './cqrs/queries/handlers/get-item-by-id.query.handler';
+import { GetItemsByOwnerIdHandler } from './cqrs/queries/handlers/get-items-by-owner-id.handler';
 
 const commandHandlers = [CreateItemCommandHandler];
-const queryHandlers = [GetItemByIdQueryHandler];
+const queryHandlers = [GetItemByIdQueryHandler, GetItemsByOwnerIdHandler];
 
 @Module({
   imports: [TypeOrmModule.forFeature([ItemEntity]), CqrsModule, UsersModule],

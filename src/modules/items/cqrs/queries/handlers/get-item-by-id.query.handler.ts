@@ -1,9 +1,8 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetItemByIdQuery } from '../implements/get-item-by-id.query';
-import { BadRequestException, Inject, NotFoundException } from '@nestjs/common';
+import { Inject, NotFoundException } from '@nestjs/common';
 import { ItemRepository } from 'src/modules/items/repository/item.repository';
-import { GetItemByIdResponseDto } from 'src/modules/items/dto/get-item-by-id.response.dto';
-import { isUuid } from 'uuidv4';
+import { GetItemByIdResponseDto } from 'src/modules/items/dto/response/get-item-by-id.response.dto';
 
 @QueryHandler(GetItemByIdQuery)
 export class GetItemByIdQueryHandler
@@ -15,12 +14,6 @@ export class GetItemByIdQueryHandler
   ) {}
 
   async execute(query: GetItemByIdQuery): Promise<GetItemByIdResponseDto> {
-    if (isUuid(query.id) === false) {
-      throw new BadRequestException({
-        description: `Invalid UUID format for ID ${query.id}`,
-      });
-    }
-
     const item = await this.itemRepository.findById(query.id);
 
     if (!item) {

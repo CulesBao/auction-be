@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { UUID } from 'crypto';
-import { ItemEntity } from '../entities/item.entity';
+import { ItemEntity } from '../../entities/item.entity';
 
 export class GetItemByIdResponseDto {
   @ApiProperty({
