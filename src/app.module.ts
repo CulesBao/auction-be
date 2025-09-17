@@ -7,6 +7,7 @@ import { TypeOrmConfigService } from './database/typeorm-config.service';
 import { DataSource, DataSourceOptions } from 'typeorm';
 import { UsersModule } from './modules/users/users.module';
 import { CqrsModule } from '@nestjs/cqrs';
+import { ItemsModule } from './modules/items/items.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { CqrsModule } from '@nestjs/cqrs';
       },
     }),
     UsersModule,
+    ItemsModule,
   ],
 })
 export class AppModule {}
