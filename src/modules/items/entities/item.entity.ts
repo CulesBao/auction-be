@@ -1,0 +1,43 @@
+import { UUID } from 'crypto';
+import { UserEntity } from '../../users/entities/user.entity';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+
+@Entity('items')
+export class ItemEntity {
+  @PrimaryGeneratedColumn('uuid')
+  id: UUID;
+
+  @Column({ nullable: false, type: 'varchar', length: 100 })
+  name: string;
+
+  @Column({ nullable: false, type: 'text' })
+  description: string;
+
+  @ManyToOne(() => UserEntity, (user) => user.items, { nullable: false })
+  owner: UserEntity;
+
+  @Column({ nullable: false, type: 'decimal' })
+  startingPrice: number;
+
+  @Column({ nullable: false, type: 'timestamp' })
+  startTime: Date;
+
+  @Column({ nullable: false, type: 'timestamp' })
+  endTime: Date;
+
+  @ManyToOne(() => UserEntity, { nullable: true })
+  winner: UserEntity | null;
+
+  @Column({ type: 'decimal', nullable: true })
+  finalPrice: number | null;
+
+  @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
+  createdAt: Date;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+    onUpdate: 'CURRENT_TIMESTAMP',
+  })
+  updatedAt: Date;
+}

@@ -1,10 +1,12 @@
 import { UUID } from 'crypto';
+import { ItemEntity } from '../../items/entities/item.entity';
 import {
   Column,
   Entity,
   PrimaryGeneratedColumn,
   CreateDateColumn,
   UpdateDateColumn,
+  OneToMany,
 } from 'typeorm';
 
 @Entity('users')
@@ -44,4 +46,7 @@ export class UserEntity {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
+
+  @OneToMany(() => ItemEntity, (item) => item.owner)
+  items: ItemEntity[];
 }

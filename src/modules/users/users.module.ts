@@ -14,5 +14,6 @@ const queryHandlers = [GetUserByIdQueryHandler];
   imports: [TypeOrmModule.forFeature([UserEntity]), CqrsModule],
   controllers: [UsersController],
   providers: [UserRepository, ...commandsHandlers, ...queryHandlers],
+  exports: [UserRepository],
 })
 export class UsersModule {}
