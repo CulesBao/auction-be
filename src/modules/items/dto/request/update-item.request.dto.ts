@@ -9,7 +9,7 @@ import {
 } from 'class-validator';
 import { UUID } from 'crypto';
 
-export class CreateItemRequestDto {
+export class UpdateItemRequestDto {
   @ApiProperty({
     example: 'item name',
     description: 'Name of the item',

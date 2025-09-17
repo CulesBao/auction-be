@@ -5,8 +5,9 @@ import {
   Get,
   Param,
   ParseUUIDPipe,
+  Put,
 } from '@nestjs/common';
-import { CreateItemDto } from './dto/request/create-item.request.dto';
+import { CreateItemRequestDto } from './dto/request/create-item.request.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ItemsMapper } from './mapper/items.mapper';
@@ -14,6 +15,7 @@ import { GetItemByIdResponseDto } from './dto/response/get-item-by-id.response.d
 import { UUID } from 'crypto';
 import { GetItemByIdQuery } from './cqrs/queries/implements/get-item-by-id.query';
 import { GetItemsByOwnerIdQuery } from './cqrs/queries/implements/get-items-by-owner-id.query';
+import { UpdateItemRequestDto } from './dto/request/update-item.request.dto';
 
 @Controller('items')
 @ApiTags('items')
@@ -30,9 +32,9 @@ export class ItemsController {
     description: 'The item has been successfully created.',
   })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
-  create(@Body() createItemDto: CreateItemDto) {
+  create(@Body() createItemRequestDto: CreateItemRequestDto) {
     return this.commandBus.execute(
-      ItemsMapper.fromCreateItemDto(createItemDto),
+      ItemsMapper.fromCreateItemRequestDto(createItemRequestDto),
     );
   }
 
@@ -48,7 +50,7 @@ export class ItemsController {
     return this.queryBus.execute(new GetItemByIdQuery(id));
   }
 
-  @Get('owner/:ownerId')
+  @Get(':ownerId/owner')
   @ApiOperation({ summary: 'Get items by owner ID' })
   @ApiResponse({
     status: 200,
@@ -57,5 +59,22 @@ export class ItemsController {
   })
   getItemsByOwnerId(@Param('ownerId', ParseUUIDPipe) ownerId: UUID) {
     return this.queryBus.execute(new GetItemsByOwnerIdQuery(ownerId));
+  }
+
+  @Put(':id')
+  @ApiOperation({ summary: 'Update an item' })
+  @ApiResponse({
+    status: 200,
+    description: 'The item has been successfully updated.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  @ApiResponse({ status: 401, description: 'Unauthorized.' })
+  update(
+    @Param('id', ParseUUIDPipe) id: UUID,
+    @Body() updateItemRequestDto: UpdateItemRequestDto,
+  ) {
+    return this.commandBus.execute(
+      ItemsMapper.fromUpdateItemRequestDto(id, updateItemRequestDto),
+    );
   }
 }

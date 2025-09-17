@@ -20,4 +20,8 @@ export class ItemRepository {
   async findByOwnerId(ownerId: UUID): Promise<ItemEntity[]> {
     return await this.itemRepository.findBy({ ownerId });
   }
+
+  async update(id: UUID, updateData: Partial<ItemEntity>): Promise<void> {
+    await this.itemRepository.update(id, updateData);
+  }
 }
