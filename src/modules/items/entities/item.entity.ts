@@ -29,13 +29,19 @@ export class ItemEntity {
   endTime: Date;
 
   @ManyToOne(() => UserEntity, { cascade: true })
-  winner: UserEntity;
+  currentBidder: UserEntity | null;
 
   @Column({ type: 'uuid', nullable: true })
-  winnerId: UUID | null;
+  currentBidderId: UUID | null;
 
   @Column({ type: 'decimal', nullable: true })
-  finalPrice: number | null;
+  currentPrice: number | null;
+
+  @Column({
+    type: 'timestamp',
+    nullable: true,
+  })
+  biddedAt: Date | null;
 
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;

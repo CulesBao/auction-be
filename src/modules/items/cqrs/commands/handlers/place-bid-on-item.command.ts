@@ -1,0 +1,64 @@
+import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
+import { PlaceBidOnItemCommand } from '../implements/place-bid-on-item.command';
+import { ForbiddenException, Inject, NotFoundException } from '@nestjs/common';
+import { ItemRepository } from '../../../repository/item.repository';
+import { UserRepository } from '../../../../users/repository/user.repository';
+
+@CommandHandler(PlaceBidOnItemCommand)
+export class PlaceBidOnItemCommandHandler
+  implements ICommandHandler<PlaceBidOnItemCommand>
+{
+  constructor(
+    @Inject(ItemRepository)
+    private readonly itemRepository: ItemRepository,
+    @Inject(UserRepository)
+    private readonly userRepository: UserRepository,
+  ) {}
+
+  async execute(command: PlaceBidOnItemCommand): Promise<void> {
+    const item = await this.itemRepository.findById(command.itemId);
+    const now = new Date();
+    if (!item) {
+      throw new NotFoundException({
+        description: `Item with ID ${command.itemId} not found`,
+      });
+    }
+
+    const bidder = await this.userRepository.findById(command.bidderId);
+    if (!bidder) {
+      throw new NotFoundException({
+        description: `User with ID ${command.bidderId} not found`,
+      });
+    }
+
+    if (item.ownerId === command.bidderId) {
+      throw new ForbiddenException({
+        description: `Owner cannot place a bid on their own item with ID ${command.itemId}`,
+      });
+    }
+    const itemStartTime = new Date(item.startTime);
+    const itemEndTime = new Date(item.endTime);
+    if (now < itemStartTime || now > itemEndTime) {
+      throw new ForbiddenException({
+        description: `Bidding is not allowed on item with ID ${command.itemId} as it is not active`,
+      });
+    }
+    if (item.biddedAt && now < new Date(item.biddedAt)) {
+      throw new ForbiddenException({
+        description: `Bid time must be after the last bid time on item with ID ${command.itemId}`,
+      });
+    }
+    if (item.biddedAt && now <= item.biddedAt) {
+      throw new ForbiddenException({
+        description: `Bid time must be after the last bid time on item with ID ${command.itemId}`,
+      });
+    }
+
+    item.currentPrice = command.bidPrice;
+    item.currentBidderId = command.bidderId;
+    item.currentBidder = bidder;
+    item.biddedAt = now;
+
+    await this.itemRepository.update(item.id, item);
+  }
+}

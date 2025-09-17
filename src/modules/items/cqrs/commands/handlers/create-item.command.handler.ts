@@ -16,6 +16,12 @@ export class CreateItemCommandHandler
   ) {}
 
   async execute(command: CreateItemCommand): Promise<void> {
+    const currentDate = new Date();
+    if (command.endTime <= currentDate) {
+      throw new BadRequestException({
+        description: 'End time must be in the future',
+      });
+    }
     if (command.startTime >= command.endTime) {
       throw new BadRequestException({
         description: 'Start time must be before end time',

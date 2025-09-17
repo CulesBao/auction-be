@@ -15,9 +15,9 @@ export class Item {
 
   readonly endTime: Date;
 
-  readonly winnerId: UUID | null;
+  readonly currentPrice: number | null;
 
-  readonly finalPrice: number | null;
+  readonly currentBidderId: UUID | null;
 
   readonly createdAt: Date;
 

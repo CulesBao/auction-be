@@ -16,6 +16,7 @@ import { UUID } from 'crypto';
 import { GetItemByIdQuery } from './cqrs/queries/implements/get-item-by-id.query';
 import { GetItemsByOwnerIdQuery } from './cqrs/queries/implements/get-items-by-owner-id.query';
 import { UpdateItemRequestDto } from './dto/request/update-item.request.dto';
+import { PlaceBidOnItemRequestDto } from './dto/request/place-bid-on-item.request.dto';
 
 @Controller('items')
 @ApiTags('items')
@@ -75,6 +76,26 @@ export class ItemsController {
   ) {
     return this.commandBus.execute(
       ItemsMapper.fromUpdateItemRequestDto(id, updateItemRequestDto),
+    );
+  }
+
+  @Put(':itemId/bid')
+  @ApiOperation({ summary: 'Place a bid on an item' })
+  @ApiResponse({
+    status: 200,
+    description: 'The bid has been successfully placed.',
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @ApiResponse({ status: 404, description: 'Item or User not found.' })
+  placeBid(
+    @Param('itemId', ParseUUIDPipe) itemId: UUID,
+    @Body() placeBidOnItemRequestDto: PlaceBidOnItemRequestDto,
+  ) {
+    return this.commandBus.execute(
+      ItemsMapper.fromPlaceBidOnItemRequestDto(
+        itemId,
+        placeBidOnItemRequestDto,
+      ),
     );
   }
 }

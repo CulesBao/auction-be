@@ -47,17 +47,17 @@ export class GetItemByIdResponseDto {
 
   @ApiProperty({
     example: 250.0,
-    description: 'The final price of the item after auction ends',
+    description: 'The current price of the item',
     nullable: true,
   })
-  readonly finalPrice: number | null;
+  readonly currentPrice: number | null;
 
   @ApiProperty({
     example: '550e8400-e29b-41d4-a716-446655440000',
-    description: 'The unique identifier of the winner',
+    description: 'The unique identifier of the current bidder',
     nullable: true,
   })
-  readonly winnerId: UUID | null;
+  readonly currentBidderId: UUID | null;
 
   @ApiProperty({
     example: '2023-10-01T10:00:00Z',
@@ -80,8 +80,8 @@ export class GetItemByIdResponseDto {
       startingPrice: entity.startingPrice,
       startTime: entity.startTime,
       endTime: entity.endTime,
-      finalPrice: entity.finalPrice,
-      winnerId: entity.winnerId,
+      currentPrice: entity.currentPrice,
+      currentBidderId: entity.currentBidderId,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     };
