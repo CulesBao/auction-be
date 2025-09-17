@@ -1,6 +1,7 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemEntity } from '../entities/item.entity';
 import { Repository } from 'typeorm';
+import { UUID } from 'crypto';
 
 export class ItemRepository {
   constructor(
@@ -10,5 +11,9 @@ export class ItemRepository {
 
   async create(item: Partial<ItemEntity>): Promise<ItemEntity> {
     return await this.itemRepository.save(this.itemRepository.create(item));
+  }
+
+  async findById(id: UUID): Promise<ItemEntity | null> {
+    return await this.itemRepository.findOneBy({ id });
   }
 }

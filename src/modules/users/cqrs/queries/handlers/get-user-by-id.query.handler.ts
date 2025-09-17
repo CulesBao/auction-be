@@ -12,7 +12,7 @@ export class GetUserByIdQueryHandler
     @Inject(UserRepository)
     private readonly userRepository: UserRepository,
   ) {}
-  async execute(query: GetUserByIdQuery): Promise<any> {
+  async execute(query: GetUserByIdQuery): Promise<GetUserByIdResponseDto> {
     const user = await this.userRepository.findById(query.id);
 
     if (!user) {
