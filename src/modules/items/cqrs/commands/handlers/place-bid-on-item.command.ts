@@ -54,11 +54,12 @@ export class PlaceBidOnItemCommandHandler
       });
     }
 
-    item.currentPrice = command.bidPrice;
-    item.currentBidderId = command.bidderId;
-    item.currentBidder = bidder;
-    item.biddedAt = now;
-
-    await this.itemRepository.update(item.id, item);
+    await this.itemRepository.create({
+      ...item,
+      currentPrice: command.bidPrice,
+      currentBidderId: command.bidderId,
+      currentBidder: bidder,
+      biddedAt: now,
+    });
   }
 }
