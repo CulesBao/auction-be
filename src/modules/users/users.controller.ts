@@ -1,11 +1,20 @@
-import { Controller, Post, Body, Get, Param } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  Get,
+  Param,
+  Put,
+  ParseUUIDPipe,
+} from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
-import { CreateUserDto } from './dto/create-user.dto';
+import { CreateUserRequestDto } from './dto/request/create-user.request.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { UserMapper } from './mappers/user.mapper';
-import { GetUserByIdResponseDto } from './dto/get-user-by-id.response.dto';
+import { GetUserByIdResponseDto } from './dto/response/get-user-by-id.response.dto';
 import { GetUserByIdQuery } from './cqrs/queries/implements/get-user-by-id.query';
 import { UUID } from 'crypto';
+import { UpdateUserRequestDto } from './dto/request/update-user.request.dto';
 
 @ApiTags('users')
 @Controller('users')
@@ -23,8 +32,12 @@ export class UsersController {
   })
   @ApiResponse({ status: 400, description: 'Bad Request.' })
   @ApiResponse({ status: 409, description: 'User already exists.' })
-  async create(@Body() createUserDto: CreateUserDto): Promise<void> {
-    await this.commandBus.execute(UserMapper.fromCreateUserDto(createUserDto));
+  async create(
+    @Body() createUserRequestDto: CreateUserRequestDto,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      UserMapper.fromCreateUserRequestDto(createUserRequestDto),
+    );
   }
 
   @Get(':userId')
@@ -39,5 +52,25 @@ export class UsersController {
     @Param('userId') userId: UUID,
   ): Promise<GetUserByIdResponseDto> {
     return await this.queryBus.execute(new GetUserByIdQuery(userId));
+  }
+
+  @Put(':userId')
+  @ApiOperation({ summary: 'Update user by ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been successfully updated.',
+  })
+  @ApiResponse({ status: 404, description: 'User not found.' })
+  @ApiResponse({
+    status: 403,
+    description: 'Forbidden. New password must be different from the old one.',
+  })
+  async update(
+    @Param('userId', ParseUUIDPipe) userId: UUID,
+    @Body() updateUserRequestDto: UpdateUserRequestDto,
+  ): Promise<void> {
+    await this.commandBus.execute(
+      UserMapper.fromUpdateUserRequestDto(userId, updateUserRequestDto),
+    );
   }
 }
