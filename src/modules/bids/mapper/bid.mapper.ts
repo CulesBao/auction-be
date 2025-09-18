@@ -5,6 +5,6 @@ export class BidMapper {
   static fromPlaceBidOnItemRequestDto(
     dto: PlaceBidOnItemRequestDto,
   ): PlaceBidOnItemCommand {
-    return new PlaceBidOnItemCommand(dto.userId, dto.itemId, dto.price);
+    return new PlaceBidOnItemCommand(dto.itemId, dto.userId, dto.price);
   }
 }

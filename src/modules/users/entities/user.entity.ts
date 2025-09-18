@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
-import { BidEntity } from 'src/modules/bids/entities/bid.entity';
+import { BidEntity } from '../../bids/entities/bid.entity';
 
 @Entity('users')
 export class UserEntity {

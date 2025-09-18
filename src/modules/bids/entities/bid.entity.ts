@@ -1,6 +1,6 @@
 import { UUID } from 'crypto';
-import { ItemEntity } from 'src/modules/items/entities/item.entity';
-import { UserEntity } from 'src/modules/users/entities/user.entity';
+import { ItemEntity } from '../../items/entities/item.entity';
+import { UserEntity } from '../../users/entities/user.entity';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('bids')

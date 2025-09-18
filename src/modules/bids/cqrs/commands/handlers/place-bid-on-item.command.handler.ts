@@ -20,24 +20,21 @@ export class PlaceBidOnItemCommandHandler
   ) {}
 
   async execute(command: PlaceBidOnItemCommand): Promise<void> {
-    const [user, item, highestBid] = await Promise.all([
-      this.userRepository.findById(command.userId),
-      this.itemRepository.findById(command.itemId),
-      this.bidRepository.findByItemId(command.itemId),
-    ]);
-
+    const user = await this.userRepository.findById(command.userId);
     if (!user) {
       throw new NotFoundException({
         description: `User with ID ${command.userId} not found.`,
       });
     }
 
+    const item = await this.itemRepository.findById(command.itemId);
     if (!item) {
       throw new NotFoundException({
         description: `Item with ID ${command.itemId} not found.`,
       });
     }
 
+    const highestBid = await this.bidRepository.findByItemId(command.itemId);
     BidDomainService.ensureBiddingPeriodValid(item.startTime, item.endTime);
 
     BidDomainService.ensureNotOwner(item.ownerId, command.userId);
