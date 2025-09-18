@@ -5,6 +5,7 @@ import { BidRepository } from 'src/modules/bids/repository/bid.repository';
 import { UserRepository } from 'src/modules/users/repository/user.repository';
 import { ItemRepository } from 'src/modules/items/repository/item.repository';
 import { BidDomainService } from 'src/modules/bids/domain/bid-domain.service';
+import { DataSource } from 'typeorm';
 
 @CommandHandler(PlaceBidOnItemCommand)
 export class PlaceBidOnItemCommandHandler
@@ -17,6 +18,7 @@ export class PlaceBidOnItemCommandHandler
     private readonly userRepository: UserRepository,
     @Inject(ItemRepository)
     private readonly itemRepository: ItemRepository,
+    private readonly dataSource: DataSource,
   ) {}
 
   async execute(command: PlaceBidOnItemCommand): Promise<void> {
@@ -45,6 +47,14 @@ export class PlaceBidOnItemCommandHandler
       highestBid?.price,
     );
 
-    await this.bidRepository.create(command);
+    await this.dataSource.transaction(async () => {
+      await this.bidRepository.create(command);
+      await this.itemRepository.create({
+        ...item,
+        winner: user,
+        winnerId: user.id,
+        finalPrice: command.price,
+      });
+    });
   }
 }

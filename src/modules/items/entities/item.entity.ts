@@ -35,6 +35,15 @@ export class ItemEntity {
   @Column({ nullable: false, type: 'timestamp' })
   endTime: Date;
 
+  @ManyToOne(() => UserEntity, { cascade: true })
+  winner: UserEntity;
+
+  @Column({ type: 'uuid', nullable: true })
+  winnerId: UUID | null;
+
+  @Column({ type: 'decimal', nullable: true })
+  finalPrice: number | null;
+
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
