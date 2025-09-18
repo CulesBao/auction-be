@@ -8,6 +8,7 @@ import {
   UpdateDateColumn,
   OneToMany,
 } from 'typeorm';
+import { BidEntity } from 'src/modules/bids/entities/bid.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -49,4 +50,7 @@ export class UserEntity {
 
   @OneToMany(() => ItemEntity, (item) => item.owner)
   items: ItemEntity[];
+
+  @OneToMany(() => BidEntity, (bid) => bid.user)
+  bids: BidEntity[];
 }
