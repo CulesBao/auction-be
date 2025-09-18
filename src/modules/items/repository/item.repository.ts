@@ -2,7 +2,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { ItemEntity } from '../entities/item.entity';
 import { Repository } from 'typeorm';
 import { UUID } from 'crypto';
+import { Injectable } from '@nestjs/common';
 
+@Injectable()
 export class ItemRepository {
   constructor(
     @InjectRepository(ItemEntity)

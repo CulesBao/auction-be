@@ -4,6 +4,27 @@ import { ForbiddenException, Inject, NotFoundException } from '@nestjs/common';
 import { ItemRepository } from '../../../repository/item.repository';
 import { UserRepository } from '../../../../users/repository/user.repository';
 
+const validateBidTime = (
+  startTime: Date,
+  endTime: Date,
+  itemId: string,
+  biddedAt: Date | null,
+) => {
+  const now = new Date();
+
+  if (now < startTime || now > endTime) {
+    throw new ForbiddenException({
+      description: `Bidding is not allowed on item with ID ${itemId} as it is not active`,
+    });
+  }
+
+  if (biddedAt && now <= biddedAt) {
+    throw new ForbiddenException({
+      description: `Bid time must be after the last bid time on item with ID ${itemId}`,
+    });
+  }
+};
+
 @CommandHandler(PlaceBidOnItemCommand)
 export class PlaceBidOnItemCommandHandler
   implements ICommandHandler<PlaceBidOnItemCommand>
@@ -36,23 +57,8 @@ export class PlaceBidOnItemCommandHandler
         description: `Owner cannot place a bid on their own item with ID ${command.itemId}`,
       });
     }
-    const itemStartTime = new Date(item.startTime);
-    const itemEndTime = new Date(item.endTime);
-    if (now < itemStartTime || now > itemEndTime) {
-      throw new ForbiddenException({
-        description: `Bidding is not allowed on item with ID ${command.itemId} as it is not active`,
-      });
-    }
-    if (item.biddedAt && now < new Date(item.biddedAt)) {
-      throw new ForbiddenException({
-        description: `Bid time must be after the last bid time on item with ID ${command.itemId}`,
-      });
-    }
-    if (item.biddedAt && now <= item.biddedAt) {
-      throw new ForbiddenException({
-        description: `Bid time must be after the last bid time on item with ID ${command.itemId}`,
-      });
-    }
+
+    validateBidTime(item.startTime, item.endTime, item.id, item.biddedAt);
 
     await this.itemRepository.create({
       ...item,

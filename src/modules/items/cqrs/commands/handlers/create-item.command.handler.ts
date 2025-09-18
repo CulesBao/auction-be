@@ -3,6 +3,7 @@ import { CreateItemCommand } from '../implements/create-item.command';
 import { BadRequestException, Inject, NotFoundException } from '@nestjs/common';
 import { ItemRepository } from 'src/modules/items/repository/item.repository';
 import { UserRepository } from 'src/modules/users/repository/user.repository';
+import { AuctionTimeVo } from 'src/modules/items/domain/vo/auction-time.vo';
 
 @CommandHandler(CreateItemCommand)
 export class CreateItemCommandHandler
@@ -16,16 +17,12 @@ export class CreateItemCommandHandler
   ) {}
 
   async execute(command: CreateItemCommand): Promise<void> {
-    const currentDate = new Date();
-    if (command.endTime <= currentDate) {
-      throw new BadRequestException({
-        description: 'End time must be in the future',
-      });
-    }
-    if (command.startTime >= command.endTime) {
-      throw new BadRequestException({
-        description: 'Start time must be before end time',
-      });
+    try {
+      new AuctionTimeVo(command.startTime, command.endTime).validate();
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException({ description: error.message });
+      }
     }
 
     const user = await this.userRepository.findById(command.ownerId);

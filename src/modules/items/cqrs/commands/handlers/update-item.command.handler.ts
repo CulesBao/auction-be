@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { ItemRepository } from 'src/modules/items/repository/item.repository';
+import { AuctionTimeVo } from 'src/modules/items/domain/vo/auction-time.vo';
 
 @CommandHandler(UpdateItemCommand)
 export class UpdateItemCommandHandler
@@ -17,29 +18,28 @@ export class UpdateItemCommandHandler
   ) {}
 
   async execute(command: UpdateItemCommand): Promise<void> {
-    const currentDate = new Date();
-    if (command.endTime <= currentDate) {
-      throw new BadRequestException({
-        description: 'End time must be in the future',
-      });
-    }
-    if (command.startTime >= command.endTime) {
-      throw new BadRequestException({
-        description: 'Start time must be before end time',
-      });
+    try {
+      new AuctionTimeVo(command.startTime, command.endTime).validate();
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new BadRequestException({ description: error.message });
+      }
     }
 
     const item = await this.itemRepository.findById(command.id);
+
     if (!item) {
       throw new BadRequestException({
         description: `Item with ID ${command.id} not found`,
       });
     }
+
     if (item.ownerId !== command.ownerId) {
       throw new UnauthorizedException({
         description: 'You are not the owner of this item',
       });
     }
+
     if (item.currentPrice && item.currentPrice < command.startingPrice) {
       throw new BadRequestException({
         description:
