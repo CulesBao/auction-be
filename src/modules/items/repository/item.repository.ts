@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemEntity } from '../entities/item.entity';
-import { IsNull, Repository } from 'typeorm';
+import { IsNull, LessThan, Repository } from 'typeorm';
 import { UUID } from 'crypto';
 import { MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
 
@@ -45,6 +45,15 @@ export class ItemRepository {
                 : undefined,
         winnerId: IsNull(),
         finalPrice: IsNull(),
+      },
+    });
+  }
+
+  async findWinningBidsByUserId(userId: UUID): Promise<ItemEntity[]> {
+    return await this.itemRepository.find({
+      where: {
+        winnerId: userId,
+        endTime: LessThan(new Date()),
       },
     });
   }

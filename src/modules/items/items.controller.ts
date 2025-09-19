@@ -19,6 +19,8 @@ import { GetItemsByOwnerIdQuery } from './cqrs/queries/implements/get-items-by-o
 import { UpdateItemRequestDto } from './dto/request/update-item.request.dto';
 import { GetNonBiddedItemsResponseDto } from './dto/response/get-non-bidded-items.response.dto';
 import { GetNonBiddedItemsQuery } from './cqrs/queries/implements/get-non-bidded-items.query';
+import { GetWinningBidsByUserIdResponseDto } from './dto/response/get-winning-bids-by-user-id.response.dto';
+import { GetWinningBidsByUserIdQuery } from './cqrs/queries/implements/get-winning-bids-by-user-id.query';
 
 @Controller('items')
 @ApiTags('items')
@@ -59,6 +61,17 @@ export class ItemsController {
     return this.queryBus.execute(
       new GetNonBiddedItemsQuery(name, startingPriceFrom, startingPriceTo),
     );
+  }
+
+  @Get(':userId/winning-bids')
+  @ApiOperation({ summary: 'Get winning bids by user ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'The winning bids have been successfully retrieved.',
+    type: [GetWinningBidsByUserIdResponseDto],
+  })
+  getWinningBidsByUserId(@Param('userId', ParseUUIDPipe) userId: UUID) {
+    return this.queryBus.execute(new GetWinningBidsByUserIdQuery(userId));
   }
 
   @Get(':id')
