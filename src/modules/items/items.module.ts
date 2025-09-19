@@ -9,9 +9,14 @@ import { UsersModule } from '../users/users.module';
 import { GetItemByIdQueryHandler } from './cqrs/queries/handlers/get-item-by-id.query.handler';
 import { GetItemsByOwnerIdHandler } from './cqrs/queries/handlers/get-items-by-owner-id.handler';
 import { UpdateItemCommandHandler } from './cqrs/commands/handlers/update-item.command.handler';
+import { GetNonBiddedItemsQueryHandler } from './cqrs/queries/handlers/get-non-bidded-items.query.handler';
 
 const commandHandlers = [CreateItemCommandHandler, UpdateItemCommandHandler];
-const queryHandlers = [GetItemByIdQueryHandler, GetItemsByOwnerIdHandler];
+const queryHandlers = [
+  GetItemByIdQueryHandler,
+  GetItemsByOwnerIdHandler,
+  GetNonBiddedItemsQueryHandler,
+];
 
 @Module({
   imports: [TypeOrmModule.forFeature([ItemEntity]), CqrsModule, UsersModule],
