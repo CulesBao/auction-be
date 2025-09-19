@@ -3,7 +3,6 @@ import { CreateItemCommand } from '../cqrs/commands/implements/create-item.comma
 import { UpdateItemCommand } from '../cqrs/commands/implements/update-item.command';
 import { CreateItemRequestDto } from '../dto/request/create-item.request.dto';
 import { UpdateItemRequestDto } from '../dto/request/update-item.request.dto';
-
 export class ItemsMapper {
   static fromCreateItemRequestDto(
     dto: CreateItemRequestDto,

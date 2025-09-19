@@ -6,16 +6,21 @@ import {
   Param,
   ParseUUIDPipe,
   Put,
+  Query,
 } from '@nestjs/common';
 import { CreateItemRequestDto } from './dto/request/create-item.request.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { ItemsMapper } from './mapper/items.mapper';
 import { GetItemByIdResponseDto } from './dto/response/get-item-by-id.response.dto';
 import { UUID } from 'crypto';
 import { GetItemByIdQuery } from './cqrs/queries/implements/get-item-by-id.query';
 import { GetItemsByOwnerIdQuery } from './cqrs/queries/implements/get-items-by-owner-id.query';
 import { UpdateItemRequestDto } from './dto/request/update-item.request.dto';
+import { GetNonBiddedItemsResponseDto } from './dto/response/get-non-bidded-items.response.dto';
+import { GetNonBiddedItemsQuery } from './cqrs/queries/implements/get-non-bidded-items.query';
+import { GetWinningBidsByUserIdResponseDto } from './dto/response/get-winning-bids-by-user-id.response.dto';
+import { GetWinningBidsByUserIdQuery } from './cqrs/queries/implements/get-winning-bids-by-user-id.query';
 
 @Controller('items')
 @ApiTags('items')
@@ -36,6 +41,37 @@ export class ItemsController {
     return this.commandBus.execute(
       ItemsMapper.fromCreateItemRequestDto(createItemRequestDto),
     );
+  }
+
+  @Get('non-bidded')
+  @ApiOperation({ summary: 'Get non-bidded items' })
+  @ApiResponse({
+    status: 200,
+    description: 'The non-bidded items have been successfully retrieved.',
+    type: [GetNonBiddedItemsResponseDto],
+  })
+  @ApiQuery({ name: 'name', required: false, type: String })
+  @ApiQuery({ name: 'startingPriceFrom', required: false, type: Number })
+  @ApiQuery({ name: 'startingPriceTo', required: false, type: Number })
+  getNonBiddedItems(
+    @Query('name') name?: string,
+    @Query('startingPriceFrom') startingPriceFrom?: number,
+    @Query('startingPriceTo') startingPriceTo?: number,
+  ) {
+    return this.queryBus.execute(
+      new GetNonBiddedItemsQuery(name, startingPriceFrom, startingPriceTo),
+    );
+  }
+
+  @Get(':userId/winning-bids')
+  @ApiOperation({ summary: 'Get winning bids by user ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'The winning bids have been successfully retrieved.',
+    type: [GetWinningBidsByUserIdResponseDto],
+  })
+  getWinningBidsByUserId(@Param('userId', ParseUUIDPipe) userId: UUID) {
+    return this.queryBus.execute(new GetWinningBidsByUserIdQuery(userId));
   }
 
   @Get(':id')

@@ -2,7 +2,8 @@ import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetUserByIdQuery } from '../implements/get-user-by-id.query';
 import { UserRepository } from 'src/modules/users/repository/user.repository';
 import { Inject, NotFoundException } from '@nestjs/common';
-import { GetUserByIdResponseDto } from 'src/modules/users/dto/get-user-by-id.response.dto';
+import { GetUserByIdResponseDto } from 'src/modules/users/dto/response/get-user-by-id.response.dto';
+import { UserMapper } from 'src/modules/users/mappers/user.mapper';
 
 @QueryHandler(GetUserByIdQuery)
 export class GetUserByIdQueryHandler
@@ -19,6 +20,6 @@ export class GetUserByIdQueryHandler
       throw new NotFoundException(`User with ID ${query.id} not found`);
     }
 
-    return GetUserByIdResponseDto.fromEntity(user);
+    return UserMapper.fromEntity(user);
   }
 }
