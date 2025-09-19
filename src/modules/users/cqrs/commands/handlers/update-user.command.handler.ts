@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UpdateUserCommand } from '../implements/update-user.command';
-import { ForbiddenException, Inject, NotFoundException } from '@nestjs/common';
+import { Inject, NotFoundException } from '@nestjs/common';
 import { UserRepository } from 'src/modules/users/repository/user.repository';
 import * as bcrypt from 'bcrypt';
 
@@ -19,12 +19,6 @@ export class UpdateUserCommandHandler
     if (!user) {
       throw new NotFoundException({
         description: `User with ID ${command.id} not found.`,
-      });
-    }
-
-    if (password && bcrypt.compareSync(password, user.password)) {
-      throw new ForbiddenException({
-        description: `New password must be different from the old one.`,
       });
     }
 
