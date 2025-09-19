@@ -1,7 +1,7 @@
 import { ForbiddenException } from '@nestjs/common';
 import { UUID } from 'crypto';
 
-export class BidDomainService {
+export class BidDomainValidation {
   static ensureBiddingPeriodValid(startTime: Date, endTime: Date) {
     const now = new Date();
     if (endTime < now)
