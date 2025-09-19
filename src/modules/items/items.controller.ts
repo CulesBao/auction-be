@@ -21,6 +21,8 @@ import { GetNonBiddedItemsResponseDto } from './dto/response/get-non-bidded-item
 import { GetNonBiddedItemsQuery } from './cqrs/queries/implements/get-non-bidded-items.query';
 import { GetWinningBidsByUserIdResponseDto } from './dto/response/get-winning-bids-by-user-id.response.dto';
 import { GetWinningBidsByUserIdQuery } from './cqrs/queries/implements/get-winning-bids-by-user-id.query';
+import { GetRevenueByOwnerIdResponseDto } from './dto/response/get-revenue-by-owner-id.response.dto';
+import { GetRevenueByOwnerIdQuery } from './cqrs/queries/implements/get-revenue-by-owner-id.query';
 
 @Controller('items')
 @ApiTags('items')
@@ -72,6 +74,37 @@ export class ItemsController {
   })
   getWinningBidsByUserId(@Param('userId', ParseUUIDPipe) userId: UUID) {
     return this.queryBus.execute(new GetWinningBidsByUserIdQuery(userId));
+  }
+
+  @Get(':userId/revenue')
+  @ApiOperation({
+    summary: 'Get total revenue by owner ID within a date range',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'The total revenue has been successfully retrieved.',
+    type: GetRevenueByOwnerIdResponseDto,
+  })
+  @ApiQuery({
+    name: 'startDate',
+    required: true,
+    type: String,
+    description: 'Start date in ISO format (e.g., 2023-01-01)',
+  })
+  @ApiQuery({
+    name: 'endDate',
+    required: true,
+    type: String,
+    description: 'End date in ISO format (e.g., 2023-12-31)',
+  })
+  getRevenueByOwnerId(
+    @Param('userId', ParseUUIDPipe) userId: UUID,
+    @Query('startDate') startDate: Date,
+    @Query('endDate') endDate: Date,
+  ) {
+    return this.queryBus.execute(
+      new GetRevenueByOwnerIdQuery(userId, startDate, endDate),
+    );
   }
 
   @Get(':id')
