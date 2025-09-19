@@ -23,12 +23,8 @@ export class UpdateItemCommandHandler
       });
     }
 
-    const item = await this.itemRepository.findById(command.id);
-    if (!item) {
-      throw new BadRequestException({
-        description: `Item with ID ${command.id} not found`,
-      });
-    }
+    const item = await this.itemRepository.findByIdOrThrow(command.id);
+
     if (item.ownerId !== command.ownerId) {
       throw new UnauthorizedException({
         description: 'You are not the owner of this item',

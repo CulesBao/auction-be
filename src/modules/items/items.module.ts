@@ -24,5 +24,6 @@ const queryHandlers = [
   imports: [TypeOrmModule.forFeature([ItemEntity]), CqrsModule, UsersModule],
   controllers: [ItemsController],
   providers: [ItemRepository, ...commandHandlers, ...queryHandlers],
+  exports: [ItemRepository],
 })
 export class ItemsModule {}

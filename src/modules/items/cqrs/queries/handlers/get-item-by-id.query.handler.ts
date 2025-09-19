@@ -1,6 +1,6 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetItemByIdQuery } from '../implements/get-item-by-id.query';
-import { Inject, NotFoundException } from '@nestjs/common';
+import { Inject } from '@nestjs/common';
 import { ItemRepository } from 'src/modules/items/repository/item.repository';
 import { GetItemByIdResponseDto } from 'src/modules/items/dto/response/get-item-by-id.response.dto';
 
@@ -14,13 +14,7 @@ export class GetItemByIdQueryHandler
   ) {}
 
   async execute(query: GetItemByIdQuery): Promise<GetItemByIdResponseDto> {
-    const item = await this.itemRepository.findById(query.id);
-
-    if (!item) {
-      throw new NotFoundException({
-        description: `Item with ID ${query.id} not found`,
-      });
-    }
+    const item = await this.itemRepository.findByIdOrThrow(query.id);
 
     return GetItemByIdResponseDto.fromEntity(item);
   }
