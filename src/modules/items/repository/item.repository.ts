@@ -31,30 +31,26 @@ export class ItemRepository {
     startingPriceFrom: number | undefined,
     startingPriceTo: number | undefined,
   ): Promise<ItemEntity[]> {
-    return await this.itemRepository.find({
-      where: {
-        name: name ? `%${name}%` : undefined,
-        startingPrice:
-          startingPriceFrom && startingPriceTo
-            ? MoreThanOrEqual(startingPriceFrom) &&
-              LessThanOrEqual(startingPriceTo)
-            : startingPriceFrom
-              ? MoreThanOrEqual(startingPriceFrom)
-              : startingPriceTo
-                ? LessThanOrEqual(startingPriceTo)
-                : undefined,
-        winnerId: IsNull(),
-        finalPrice: IsNull(),
-      },
+    return await this.itemRepository.findBy({
+      name: name ? `%${name}%` : undefined,
+      startingPrice:
+        startingPriceFrom && startingPriceTo
+          ? MoreThanOrEqual(startingPriceFrom) &&
+            LessThanOrEqual(startingPriceTo)
+          : startingPriceFrom
+            ? MoreThanOrEqual(startingPriceFrom)
+            : startingPriceTo
+              ? LessThanOrEqual(startingPriceTo)
+              : undefined,
+      winnerId: IsNull(),
+      finalPrice: IsNull(),
     });
   }
 
   async findWinningBidsByUserId(userId: UUID): Promise<ItemEntity[]> {
-    return await this.itemRepository.find({
-      where: {
-        winnerId: userId,
-        endTime: LessThan(new Date()),
-      },
+    return await this.itemRepository.findBy({
+      winnerId: userId,
+      endTime: LessThan(new Date()),
     });
   }
 }
