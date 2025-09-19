@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemEntity } from '../entities/item.entity';
-import { IsNull, LessThan, Repository } from 'typeorm';
+import { DataSource, IsNull, LessThan, Repository } from 'typeorm';
 import { UUID } from 'crypto';
 import { MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
 
@@ -8,6 +8,7 @@ export class ItemRepository {
   constructor(
     @InjectRepository(ItemEntity)
     private readonly itemRepository: Repository<ItemEntity>,
+    private readonly dataSource: DataSource,
   ) {}
 
   async create(item: Partial<ItemEntity>): Promise<ItemEntity> {
@@ -52,5 +53,39 @@ export class ItemRepository {
       winnerId: userId,
       endTime: LessThan(new Date()),
     });
+  }
+
+  async getRevenueByOwnerId(
+    ownerId: UUID,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<number | null> {
+    const revenue: number | null = await this.dataSource
+      .getRepository(ItemEntity)
+      .createQueryBuilder('item')
+      .select('SUM(item.finalPrice)', 'revenue')
+      .where('item.ownerId = :ownerId', { ownerId })
+      .andWhere('item.endTime BETWEEN :startDate AND :endDate', {
+        startDate,
+        endDate,
+      })
+      .andWhere('item.finalPrice IS NOT NULL')
+      .getRawOne<{ revenue: string | null }>()
+      .then(
+        (
+          result:
+            | {
+                revenue: string | null;
+              }
+            | undefined,
+        ) => {
+          if (result && result.revenue !== null) {
+            return parseFloat(result.revenue);
+          }
+          return null;
+        },
+      );
+
+    return revenue;
   }
 }

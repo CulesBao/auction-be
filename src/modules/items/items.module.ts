@@ -11,6 +11,7 @@ import { GetItemsByOwnerIdHandler } from './cqrs/queries/handlers/get-items-by-o
 import { UpdateItemCommandHandler } from './cqrs/commands/handlers/update-item.command.handler';
 import { GetNonBiddedItemsQueryHandler } from './cqrs/queries/handlers/get-non-bidded-items.query.handler';
 import { GetWinningBidsByUserIdQueryHandler } from './cqrs/queries/handlers/get-winning-bids-by-user-id.query.handler';
+import { GetRevenueByOwnerIdQueryHandler } from './cqrs/queries/handlers/get-revenue-by-owner-id.query.handler';
 
 const commandHandlers = [CreateItemCommandHandler, UpdateItemCommandHandler];
 const queryHandlers = [
@@ -18,6 +19,7 @@ const queryHandlers = [
   GetItemsByOwnerIdHandler,
   GetNonBiddedItemsQueryHandler,
   GetWinningBidsByUserIdQueryHandler,
+  GetRevenueByOwnerIdQueryHandler,
 ];
 
 @Module({
