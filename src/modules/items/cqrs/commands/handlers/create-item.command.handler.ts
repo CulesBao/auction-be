@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateItemCommand } from '../implements/create-item.command';
-import { BadRequestException, Inject, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Inject } from '@nestjs/common';
 import { ItemRepository } from 'src/modules/items/repository/item.repository';
 import { UserRepository } from 'src/modules/users/repository/user.repository';
 
@@ -22,12 +22,7 @@ export class CreateItemCommandHandler
       });
     }
 
-    const user = await this.userRepository.findById(command.ownerId);
-    if (!user) {
-      throw new NotFoundException({
-        description: `User with ID ${command.ownerId} not found`,
-      });
-    }
+    const user = await this.userRepository.findByIdOrThrow(command.ownerId);
 
     await this.itemRepository.create({
       ...command,

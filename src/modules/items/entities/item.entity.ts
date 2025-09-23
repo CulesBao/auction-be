@@ -1,6 +1,13 @@
 import { UUID } from 'crypto';
 import { UserEntity } from '../../users/entities/user.entity';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { BidEntity } from '../../bids/entities/bid.entity';
 
 @Entity('items')
 export class ItemEntity {
@@ -46,4 +53,7 @@ export class ItemEntity {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
+
+  @OneToMany(() => BidEntity, (bid) => bid.item)
+  bids: BidEntity[];
 }
