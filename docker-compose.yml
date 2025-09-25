@@ -1,0 +1,63 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    image: backend
+    container_name: backend
+    environment:
+      DB_HOST: database
+      KEYCLOAK_BASE_URL: http://keycloak:8080
+    restart: always
+    ports:
+      - "$PORT:$PORT"
+    depends_on:
+      - database
+      - keycloak
+    env_file:
+      - .env
+
+  database:
+    build: postgres
+    restart: always
+    container_name: database
+    volumes:
+    - ./postgres:/docker-entrypoint-initdb.d
+    environment:
+      POSTGRES_USER: $DB_USERNAME
+      POSTGRES_PASSWORD: $DB_PASSWORD
+      POSTGRES_MULTIPLE_DATABASES: $DB_DATABASE, keycloak
+      TZ: "GMT"
+      PGTZ: "GMT"
+    ports:
+      - "$DB_PORT:$DB_PORT"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: keycloak
+    environment:
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://database/keycloak
+      KC_DB_USERNAME: $DB_USERNAME
+      KC_DB_PASSWORD: $DB_PASSWORD
+      KEYCLOAK_ADMIN: $KEYCLOAK_ADMIN
+      KEYCLOAK_ADMIN_PASSWORD: $KEYCLOAK_ADMIN_PASSWORD
+      KC_LOG_LEVEL: debug
+      KC_LOG_CONSOLE_COLOR: "true"
+      KC_LOG_CONSOLE_OUTPUT: default
+    volumes:
+      - ./keycloak/data:/opt/keycloak/data
+      - ./keycloak/import:/opt/keycloak/data/import
+    ports:
+      - "$KEYCLOAK_PORT:8080"
+    depends_on:
+      - database
+    command:
+      [
+        "start-dev",
+        "--import-realm",
+        "--features=preview",
+        "--spi-scripts-default-provider=default",
+        "--spi-scripts-default-enabled=true",
+        "--spi-authorization-policy-provider-js-enabled=true"
+      ]
