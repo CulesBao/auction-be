@@ -28,7 +28,16 @@ export class User {
 
   public static fromEntity(userEntity: UserEntity): User {
     return {
-      ...userEntity,
+      id: userEntity.id,
+      role: userEntity.role,
+      keyCloakId: userEntity.keyCloakId ?? null,
+      firstName: userEntity.firstName,
+      lastName: userEntity.lastName,
+      email: userEntity.email,
+      picture: userEntity.picture,
+      gender: userEntity.gender,
+      birthday: userEntity.birthday,
+      phoneNumber: userEntity.phoneNumber,
     };
   }
 }
