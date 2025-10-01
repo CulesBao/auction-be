@@ -92,8 +92,13 @@ export class ApiConfigService {
 
   private getStringArray(key: string): string[] {
     const value = this.get(key);
-
-    return JSON.parse(value);
+    if (!value) {
+      return [];
+    }
+    return value
+      .split(",")
+      .map(v => v.trim())
+      .filter(v => v.length > 0);
   }
 
   private getNumber(key: string): number {
