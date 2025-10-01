@@ -24,12 +24,6 @@ async function bootstrap() {
     }),
   );
 
-  app.enableCors({
-    origin: 'http://localhost:5500',
-    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-    credentials: true,
-  });
-
   app.use(json({ limit: "10mb" }));
   app.use(urlencoded({ extended: true, limit: "10mb" }));
 
