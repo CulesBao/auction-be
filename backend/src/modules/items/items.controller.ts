@@ -30,6 +30,7 @@ import { AuthUser } from 'decorator/auth-user.decorator';
 import { UserEntity } from 'modules/user/entities/user.entity';
 import { GetWinningBidsByUserIdExportPdfQuery } from './cqrs/queries/implements/get-winning-bids-by-user-id-export-pdf.query';
 import { GetItemByIdExportPdfQuery } from './cqrs/queries/implements/get-item-by-id-export-pdf.query';
+import { LockItemCommand } from './cqrs/commands/implements/lock-item.command';
 
 @Controller('items')
 @ApiTags('items')
@@ -182,6 +183,20 @@ export class ItemsController {
   @ApiResponse({ status: 404, description: 'Item not found.' })
   getItemById(@Param('id', ParseUUIDPipe) id: Uuid) {
     return this.queryBus.execute(new GetItemByIdQuery(id));
+  }
+
+  @Put(':id/lock')
+  @ApiOperation({ summary: 'Lock an item' })
+  @ApiResponse({
+    status: 200,
+    description: 'The item has been successfully locked.',
+  })
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @RequireLoggedIn()
+  @ApiBearerAuth()
+  lock(@Param('id', ParseUUIDPipe) id: Uuid, @AuthUser() user: UserEntity) {
+    return this.commandBus.execute(new LockItemCommand(id, user.id));
   }
 
   @Put(':id')
