@@ -32,6 +32,21 @@ export class ItemRepository {
     return item;
   }
 
+  async findByIdWithRelationsOrThrow(id: Uuid): Promise<ItemEntity> {
+    const item = await this.itemRepository.findOne({
+      where: { id },
+      relations: ['owner', 'bids', 'bids.user', 'winner'],
+    });
+
+    if (!item) {
+      throw new NotFoundException({
+        description: `Item with ID ${id} not found.`,
+      });
+    }
+
+    return item;
+  }
+
   async findByOwnerId(ownerId: Uuid): Promise<ItemEntity[]> {
     return await this.itemRepository.findBy({ ownerId });
   }

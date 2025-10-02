@@ -13,6 +13,7 @@ import { GetNonBiddedItemsQueryHandler } from './cqrs/queries/handlers/get-non-b
 import { GetWinningBidsByUserIdQueryHandler } from './cqrs/queries/handlers/get-winning-bids-by-user-id.query.handler';
 import { GetRevenueByOwnerIdQueryHandler } from './cqrs/queries/handlers/get-revenue-by-owner-id.query.handler';
 import { GetWinningBidsByUserIdExportPdfQueryHandler } from './cqrs/queries/handlers/get-winning-bids-by-user-id-export-pdf.query.handler';
+import { GetItemByIdExportPdfQueryHandler } from './cqrs/queries/handlers/get-item-by-id-export-pdf.query.handler';
 
 const commandHandlers = [CreateItemCommandHandler, UpdateItemCommandHandler];
 const queryHandlers = [
@@ -21,7 +22,8 @@ const queryHandlers = [
   GetNonBiddedItemsQueryHandler,
   GetWinningBidsByUserIdQueryHandler,
   GetRevenueByOwnerIdQueryHandler,
-  GetWinningBidsByUserIdExportPdfQueryHandler
+  GetWinningBidsByUserIdExportPdfQueryHandler,
+  GetItemByIdExportPdfQueryHandler
 ];
 
 @Module({

@@ -29,6 +29,7 @@ import { RequireLoggedIn } from 'guards/role-container';
 import { AuthUser } from 'decorator/auth-user.decorator';
 import { UserEntity } from 'modules/user/entities/user.entity';
 import { GetWinningBidsByUserIdExportPdfQuery } from './cqrs/queries/implements/get-winning-bids-by-user-id-export-pdf.query';
+import { GetItemByIdExportPdfQuery } from './cqrs/queries/implements/get-item-by-id-export-pdf.query';
 
 @Controller('items')
 @ApiTags('items')
@@ -49,7 +50,8 @@ export class ItemsController {
   @RequireLoggedIn()
   create(
     @AuthUser() user: UserEntity,
-    @Body() createItemRequestDto: CreateItemRequestDto) {
+    @Body() createItemRequestDto: CreateItemRequestDto,
+  ) {
     return this.commandBus.execute(
       ItemsMapper.fromCreateItemRequestDto(createItemRequestDto, user.id),
     );
@@ -75,15 +77,25 @@ export class ItemsController {
     );
   }
 
-  @Get(':userId/winning-bids')
-  @ApiOperation({ summary: 'Get winning bids by user ID' })
+  @Get('/pdf/:id')
+  @ApiOperation({ summary: 'Export item by ID to PDF' })
   @ApiResponse({
     status: 200,
-    description: 'The winning bids have been successfully retrieved.',
-    type: [GetWinningBidsByUserIdResponseDto],
+    description: 'The item PDF has been successfully generated and sent.',
+    content: { 'application/pdf': { schema: { type: 'string', format: 'binary' } } },
   })
-  getWinningBidsByUserId(@Param('userId', ParseUUIDPipe) userId: Uuid) {
-    return this.queryBus.execute(new GetWinningBidsByUserIdQuery(userId));
+  async getItemByIdExportPdf(
+    @Param('id', ParseUUIDPipe) id: Uuid,
+    @Res() res: Response,
+  ) {
+    const pdfBuffer: Buffer = await this.queryBus.execute(new GetItemByIdExportPdfQuery(id));
+    const filename = `item-${id}.pdf`;
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Length': pdfBuffer.length,
+    });
+    return res.send(pdfBuffer);
   }
 
   @Get(':userId/winning-bids/pdf')
@@ -95,10 +107,9 @@ export class ItemsController {
   })
   async getWinningBidsByUserIdExportPdf(
     @Param('userId', ParseUUIDPipe) userId: Uuid,
-    @Res() res: Response
+    @Res() res: Response,
   ) {
     const pdfBuffer: Buffer = await this.queryBus.execute(new GetWinningBidsByUserIdExportPdfQuery(userId));
-
     const filename = `winning-bids-${userId}.pdf`;
     res.set({
       'Content-Type': 'application/pdf',
@@ -106,6 +117,17 @@ export class ItemsController {
       'Content-Length': pdfBuffer.length,
     });
     return res.send(pdfBuffer);
+  }
+
+  @Get(':userId/winning-bids')
+  @ApiOperation({ summary: 'Get winning bids by user ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'The winning bids have been successfully retrieved.',
+    type: [GetWinningBidsByUserIdResponseDto],
+  })
+  getWinningBidsByUserId(@Param('userId', ParseUUIDPipe) userId: Uuid) {
+    return this.queryBus.execute(new GetWinningBidsByUserIdQuery(userId));
   }
 
   @Get(':userId/revenue')
@@ -139,6 +161,17 @@ export class ItemsController {
     );
   }
 
+  @Get(':ownerId/owner')
+  @ApiOperation({ summary: 'Get items by owner ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'The items have been successfully retrieved.',
+    type: [GetItemByIdResponseDto],
+  })
+  getItemsByOwnerId(@Param('ownerId', ParseUUIDPipe) ownerId: Uuid) {
+    return this.queryBus.execute(new GetItemsByOwnerIdQuery(ownerId));
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get item by ID' })
   @ApiResponse({
@@ -149,17 +182,6 @@ export class ItemsController {
   @ApiResponse({ status: 404, description: 'Item not found.' })
   getItemById(@Param('id', ParseUUIDPipe) id: Uuid) {
     return this.queryBus.execute(new GetItemByIdQuery(id));
-  }
-
-  @Get(':ownerId/owner')
-  @ApiOperation({ summary: 'Get items by owner ID' })
-  @ApiResponse({
-    status: 200,
-    description: 'The items have been successfully retrieved.',
-    type: [GetItemByIdResponseDto],
-  })
-  getItemsByOwnerId(@Param('ownerId', ParseUUIDPipe) ownerId: Uuid) {
-    return this.queryBus.execute(new GetItemsByOwnerIdQuery(ownerId));
   }
 
   @Put(':id')

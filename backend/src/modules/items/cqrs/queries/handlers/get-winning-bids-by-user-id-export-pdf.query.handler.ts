@@ -5,6 +5,7 @@ import { join } from "path";
 import { CreatePdfQuery } from "modules/pdf/cqrs/queries/implements/create-pdf.query";
 import { UserRepository } from "modules/user/repository/user.repository";
 import { v4 as uuidv4 } from 'uuid';
+import { formatCurrency, formatDateTime, sum } from 'utils/format.utils';
 
 @QueryHandler(GetWinningBidsByUserIdExportPdfQuery)
 export class GetWinningBidsByUserIdExportPdfQueryHandler implements IQueryHandler<GetWinningBidsByUserIdExportPdfQuery> {
@@ -22,16 +23,11 @@ export class GetWinningBidsByUserIdExportPdfQueryHandler implements IQueryHandle
         const context = this.buildContext(userEntity, winningBids);
 
         const htmlPath = join(process.cwd(), 'src', 'templates', 'winning-bids.html');
+
         return await this.queryBus.execute(new CreatePdfQuery(htmlPath, context));
     }
 
     private buildContext(userEntity: any, winningBids: any[]) {
-        const currencyFormatter = new Intl.NumberFormat('vi-VN', {
-            style: 'currency',
-            currency: 'VND',
-        });
-        const dateFormatter = (d?: Date | string) => d ? new Date(d).toLocaleString('vi-VN', { hour12: false }) : '—';
-
         const items = (winningBids || []).map(item => ({
             id: item.id,
             name: item.name,
@@ -39,18 +35,18 @@ export class GetWinningBidsByUserIdExportPdfQueryHandler implements IQueryHandle
             startTime: item.startTime,
             endTime: item.endTime,
             finalPrice: item.finalPrice ?? 0,
-            finalPriceFormatted: item.finalPrice != null ? currencyFormatter.format(item.finalPrice) : '—',
-            startTimeFormatted: dateFormatter(item.startTime),
-            endTimeFormatted: dateFormatter(item.endTime),
+            finalPriceFormatted: formatCurrency(item.finalPrice),
+            startTimeFormatted: formatDateTime(item.startTime),
+            endTimeFormatted: formatDateTime(item.endTime),
         }));
 
-        const total = items.reduce((s, it) => s + (it.finalPrice || 0), 0);
+        const total = sum(items, it => it.finalPrice || 0);
         const summary = {
             count: items.length,
             total,
-            totalFormatted: currencyFormatter.format(total),
+            totalFormatted: formatCurrency(total),
         };
-        const generatedAt = new Date().toLocaleString('vi-VN', { hour12: false });
+        const generatedAt = formatDateTime(new Date());
         const reportId = uuidv4();
 
         return {
