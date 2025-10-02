@@ -21,6 +21,7 @@ import { ApiConfigService } from "./shared/services/api-config.service";
 import { SharedModule } from "./shared/shared.module";
 import { ItemsModule } from "modules/items/items.module";
 import { BidsModule } from "modules/bids/bids.module";
+import { PdfModule } from './modules/pdf/pdf.module';
 
 @Module({
   imports: [
@@ -57,6 +58,7 @@ import { BidsModule } from "modules/bids/bids.module";
     KeycloakModule,
     ItemsModule,
     BidsModule,
+    PdfModule,
   ],
   providers: [
     {
