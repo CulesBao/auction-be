@@ -28,6 +28,16 @@ export class ApiConfigService {
     };
   }
 
+  get stmpConfig() {
+    return {
+      host: this.getString("MAIL_HOST"),
+      port: this.getNumber("MAIL_PORT"),
+      user: this.getString("MAIL_USER"),
+      pass: this.getString("MAIL_PASS"),
+      from: this.getString("MAIL_FROM"),
+    }
+  }
+
   get keycloakConfig() {
     return {
       clientId: this.getString("KEYCLOAK_CLIENT_ID"),
