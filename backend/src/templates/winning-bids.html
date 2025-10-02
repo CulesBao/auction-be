@@ -1,0 +1,195 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Winning Bids</title>
+
+    <style>
+        /* Page setup */
+        @page {
+            size: A4;
+            margin: 18mm 15mm 18mm 15mm;
+        }
+
+        html,
+        body {
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: #333;
+            font-size: 12px;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 10px;
+            margin-bottom: 12px;
+        }
+
+        .title-block {
+            flex: 1;
+        }
+
+        .title {
+            font-size: 20px;
+            margin: 0;
+            color: #1a202c;
+        }
+
+        .subtitle {
+            font-size: 11px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        /* User summary card */
+        .user-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #fafafa;
+            border: 1px solid #eee;
+            padding: 10px;
+            border-radius: 6px;
+            margin: 12px 0;
+        }
+
+        .user-info {
+            font-size: 13px;
+        }
+
+        .summary-stats {
+            text-align: right;
+        }
+
+        /* Table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            table-layout: fixed;
+            word-wrap: break-word;
+        }
+
+        th,
+        td {
+            padding: 10px 8px;
+            border: 1px solid #e6e6e6;
+            vertical-align: top;
+        }
+
+        th {
+            background: linear-gradient(#f8fafc, #f1f5f9);
+            color: #111827;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        tbody tr:nth-child(odd) td {
+            background: #ffffff;
+        }
+
+        tbody tr:nth-child(even) td {
+            background: #fbfbfd;
+        }
+
+        .col-desc {
+            max-width: 40%;
+        }
+
+        .col-name {
+            width: 30%;
+        }
+
+        .col-price {
+            width: 15%;
+            text-align: right;
+            font-weight: 600;
+            color: #0f766e;
+        }
+
+        /* Footer (page number) */
+        .footer {
+            position: fixed;
+            bottom: 6mm;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-size: 11px;
+            color: #777;
+        }
+
+        /* Page counter (works with many html->pdf engines) */
+        .pagenum:before {
+            content: "Page " counter(page) " / " counter(pages);
+        }
+
+        /* Small helpers */
+        .muted {
+            color: #6b7280;
+            font-size: 11px;
+        }
+
+        .right {
+            text-align: right;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="title-block">
+            <h1 class="title">Winning Bids Report</h1>
+            <div class="subtitle">Generated: {{generatedAt}}</div>
+        </div>
+        <div class="muted">Report ID: {{reportId}}</div>
+    </div>
+
+    <div class="user-card">
+        <div class="user-info">
+            <div><strong>{{user.fullName}}</strong></div>
+            <div class="muted">{{user.email}}</div>
+        </div>
+        <div class="summary-stats">
+            <div><strong>{{summary.count}}</strong> items won</div>
+            <div class="muted">Total: {{summary.totalFormatted}}</div>
+        </div>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                <th class="col-name">Item</th>
+                <th class="col-desc">Description</th>
+                <th>Start</th>
+                <th>End</th>
+                <th class="col-price">Final price</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each items}}
+            <tr>
+                <td class="col-name">
+                    <div><strong>{{this.name}}</strong></div>
+                    <div class="muted">ID: {{this.id}}</div>
+                </td>
+                <td class="col-desc">{{this.description}}</td>
+                <td>{{this.startTimeFormatted}}</td>
+                <td>{{this.endTimeFormatted}}</td>
+                <td class="col-price">{{this.finalPriceFormatted}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+
+    <div style="height:18px;"></div>
+
+    <div class="footer">
+        <span class="pagenum"></span>
+    </div>
+</body>
+
+</html>

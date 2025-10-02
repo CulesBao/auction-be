@@ -7,7 +7,9 @@ import {
   ParseUUIDPipe,
   Put,
   Query,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { CreateItemRequestDto } from './dto/request/create-item.request.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -26,6 +28,7 @@ import { GetRevenueByOwnerIdQuery } from './cqrs/queries/implements/get-revenue-
 import { RequireLoggedIn } from 'guards/role-container';
 import { AuthUser } from 'decorator/auth-user.decorator';
 import { UserEntity } from 'modules/user/entities/user.entity';
+import { GetWinningBidsByUserIdExportPdfQuery } from './cqrs/queries/implements/get-winning-bids-by-user-id-export-pdf.query';
 
 @Controller('items')
 @ApiTags('items')
@@ -81,6 +84,28 @@ export class ItemsController {
   })
   getWinningBidsByUserId(@Param('userId', ParseUUIDPipe) userId: Uuid) {
     return this.queryBus.execute(new GetWinningBidsByUserIdQuery(userId));
+  }
+
+  @Get(':userId/winning-bids/pdf')
+  @ApiOperation({ summary: 'Export winning bids by user ID to PDF' })
+  @ApiResponse({
+    status: 200,
+    description: 'The winning bids PDF has been successfully generated and sent.',
+    content: { 'application/pdf': { schema: { type: 'string', format: 'binary' } } },
+  })
+  async getWinningBidsByUserIdExportPdf(
+    @Param('userId', ParseUUIDPipe) userId: Uuid,
+    @Res() res: Response
+  ) {
+    const pdfBuffer: Buffer = await this.queryBus.execute(new GetWinningBidsByUserIdExportPdfQuery(userId));
+
+    const filename = `winning-bids-${userId}.pdf`;
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Length': pdfBuffer.length,
+    });
+    return res.send(pdfBuffer);
   }
 
   @Get(':userId/revenue')
