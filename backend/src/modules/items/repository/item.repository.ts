@@ -91,7 +91,7 @@ export class ItemRepository {
       relations: { owner: true, winner: true },
     })
 
-    return items.filter(item => item.winnerId !== null);
+    return items;
   }
 
   async findWinningBidsByUserId(userId: Uuid): Promise<ItemEntity[]> {
