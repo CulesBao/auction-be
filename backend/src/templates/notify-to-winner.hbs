@@ -1,0 +1,93 @@
+<!doctype html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Congratulations — You won the auction!</title>
+    <style>
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .container {
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 18px;
+        }
+
+        .card {
+            border: 1px solid #e6e6e6;
+            background: #fff;
+            padding: 16px;
+            border-radius: 6px;
+        }
+
+        h1 {
+            font-size: 18px;
+            margin: 0 0 8px;
+        }
+
+        p {
+            margin: 8px 0;
+        }
+
+        .footer {
+            font-size: 12px;
+            color: #888;
+            margin-top: 16px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px;
+        }
+
+        th,
+        td {
+            text-align: left;
+            padding: 8px;
+            border: 1px solid #eee;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="card">
+            <h1>Congratulations, {{winner.name}}!</h1>
+            <p>You are the winner of the auction for <strong>{{name}}</strong>.</p>
+
+            <table>
+                <tr>
+                    <th>Item</th>
+                    <td>{{name}}</td>
+                </tr>
+                <tr>
+                    <th>Description</th>
+                    <td>{{description}}</td>
+                </tr>
+                <tr>
+                    <th>Start</th>
+                    <td>{{startTime}}</td>
+                </tr>
+                <tr>
+                    <th>End</th>
+                    <td>{{endTime}}</td>
+                </tr>
+                <tr>
+                    <th>Starting Price</th>
+                    <td>{{startingPrice}}</td>
+                </tr>
+            </table>
+
+            <p>Owner: {{owner.name}} ({{owner.email}})</p>
+
+            <p>If you have questions about the transaction, please contact the owner directly.</p>
+
+            <div class="footer">Thank you for using our auction platform.</div>
+        </div>
+    </div>
+</body>
+
+</html>

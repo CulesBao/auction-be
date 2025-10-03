@@ -25,6 +25,7 @@ import { PdfModule } from './modules/pdf/pdf.module';
 import { MailerModule } from "@nestjs-modules/mailer";
 import { MailerConfigService } from "shared/services/mailer-config.service";
 import { MailModule } from './modules/mail/mail.module';
+import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
   imports: [
@@ -66,7 +67,8 @@ import { MailModule } from './modules/mail/mail.module';
       useFactory: (mailerConfigService: MailerConfigService) => mailerConfigService.mailerConfig(),
       inject: [MailerConfigService],
     }),
-    MailModule
+    MailModule,
+    ScheduleModule.forRoot()
   ],
   providers: [
     {
