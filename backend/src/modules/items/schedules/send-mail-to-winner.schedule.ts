@@ -21,17 +21,23 @@ export class SendMailToWinnerSchedule {
         const rawItems = await this.itemRepository.findItemsNotNotified(now);
 
         for (const rawItem of rawItems) {
-            await this.dataSource.transaction(async () => {
-                const item = await this.itemRepository.findByIdWithRelationsOrThrow(rawItem.id);
+            await this.dataSource.transaction(async (manager) => {
+                const item = await manager.getRepository(ItemEntity).findOne({
+                    where: { id: rawItem.id },
+                    lock: { mode: 'pessimistic_write' },
+                    relations: { owner: true, winner: true }
+                });
+
+                if (!item) return;
 
                 await this.queryBus.execute(new SendMailWithTemplate(
                     item.winner.email,
                     `Congratulations! You won the auction for "${item.name}"`,
-                    'notify-to-winner.hbs',
+                    "notify-to-winner.hbs",
                     { ...this.filterData(item) }
                 ));
 
-                await this.itemRepository.update(item.id, { isWinnerNotified: true });
+                await manager.getRepository(ItemEntity).update(item.id, { isWinnerNotified: true });
             });
         }
 
