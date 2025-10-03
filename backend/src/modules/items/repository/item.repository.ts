@@ -16,6 +16,19 @@ export class ItemRepository {
     return await this.itemRepository.save(this.itemRepository.create(item));
   }
 
+  async findByIdWithLockOrThrow(id: Uuid): Promise<ItemEntity> {
+    const item = await this.itemRepository.findOne({
+      where: { id },
+      lock: { mode: 'pessimistic_write' },
+    });
+    if (!item) {
+      throw new NotFoundException({
+        description: `Item with ID $  {id} not found.`,
+      });
+    }
+    return item;
+  }
+
   async findById(id: Uuid): Promise<ItemEntity | null> {
     return await this.itemRepository.findOneBy({ id });
   }
