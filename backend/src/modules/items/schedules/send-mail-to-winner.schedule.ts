@@ -4,34 +4,45 @@ import { ItemRepository } from "../repository/item.repository";
 import { ItemEntity } from "../entities/item.entity";
 import { QueryBus } from "@nestjs/cqrs";
 import { SendMailWithTemplate } from "modules/mail/cqrs/queries/implements/send-mail-with-template.query";
+import { DataSource } from "typeorm";
 
 @Injectable()
 export class SendMailToWinnerSchedule {
     constructor(
         private readonly itemRepository: ItemRepository,
-        private readonly queryBus: QueryBus
+        private readonly queryBus: QueryBus,
+        private readonly dataSource: DataSource,
     ) { }
+
     @Cron(CronExpression.EVERY_MINUTE)
     async handleCron() {
         const now = new Date();
-        const lastMinute = new Date(now.getTime() - 60000);
 
-        const rawItems = await this.itemRepository.findItemsInRangeEndTime(lastMinute, now);
+        const rawItems = await this.itemRepository.findItemsNotNotified(now);
 
-        const items = rawItems.map(item => this.filterData(item));
+        for (const rawItem of rawItems) {
+            await this.dataSource.transaction(async (manager) => {
+                const item = await manager.getRepository(ItemEntity).findOne({
+                    where: { id: rawItem.id, isWinnerNotified: false },
+                    lock: { mode: "pessimistic_write" },
+                });
 
-        items.forEach(async (item) => {
-            await this.queryBus.execute(new SendMailWithTemplate(
-                item.winner.email,
-                `Congratulations! You won the auction for "${item.name}"`,
-                'notify-to-winner.hbs',
-                {
-                    ...item,
+                if (!item) {
+                    return;
                 }
-            ));
-        })
 
-        console.log(`[${now.toISOString()}] Sent ${items.length} email(s) to winners.`);
+                await this.queryBus.execute(new SendMailWithTemplate(
+                    item.winner.email,
+                    `Congratulations! You won the auction for "${item.name}"`,
+                    'notify-to-winner.hbs',
+                    { ...this.filterData(item) }
+                ));
+
+                await manager.getRepository(ItemEntity).update(item.id, { isWinnerNotified: true });
+            });
+        }
+
+        console.log(`[${now.toISOString()}] Sent ${rawItems.length} email(s) to winners.`);
     }
 
     private filterData(item: ItemEntity) {

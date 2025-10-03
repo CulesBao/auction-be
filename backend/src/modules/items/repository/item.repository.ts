@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemEntity } from '../entities/item.entity';
-import { Between, DataSource, IsNull, LessThan, Not, Repository } from 'typeorm';
+import { DataSource, IsNull, LessThan, Not, Repository } from 'typeorm';
 import { Uuid } from 'common/types';
 import { NotFoundException } from '@nestjs/common';
 import { MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
@@ -82,11 +82,12 @@ export class ItemRepository {
     });
   }
 
-  async findItemsInRangeEndTime(startTime: Date, endTime: Date): Promise<ItemEntity[]> {
+  async findItemsNotNotified(endTime: Date): Promise<ItemEntity[]> {
     const items = await this.itemRepository.find({
       where: {
-        endTime: Between(startTime, endTime),
+        endTime: LessThanOrEqual(endTime),
         winnerId: Not(IsNull()),
+        isWinnerNotified: false,
       },
       relations: { owner: true, winner: true },
     })
