@@ -7,7 +7,9 @@ import {
   ParseUUIDPipe,
   Put,
   Query,
+  Res,
 } from '@nestjs/common';
+import { Response } from 'express';
 import { CreateItemRequestDto } from './dto/request/create-item.request.dto';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { ApiBearerAuth, ApiOperation, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
@@ -26,6 +28,9 @@ import { GetRevenueByOwnerIdQuery } from './cqrs/queries/implements/get-revenue-
 import { RequireLoggedIn } from 'guards/role-container';
 import { AuthUser } from 'decorator/auth-user.decorator';
 import { UserEntity } from 'modules/user/entities/user.entity';
+import { GetWinningBidsByUserIdExportPdfQuery } from './cqrs/queries/implements/get-winning-bids-by-user-id-export-pdf.query';
+import { GetItemByIdExportPdfQuery } from './cqrs/queries/implements/get-item-by-id-export-pdf.query';
+import { LockItemCommand } from './cqrs/commands/implements/lock-item.command';
 
 @Controller('items')
 @ApiTags('items')
@@ -46,7 +51,8 @@ export class ItemsController {
   @RequireLoggedIn()
   create(
     @AuthUser() user: UserEntity,
-    @Body() createItemRequestDto: CreateItemRequestDto) {
+    @Body() createItemRequestDto: CreateItemRequestDto,
+  ) {
     return this.commandBus.execute(
       ItemsMapper.fromCreateItemRequestDto(createItemRequestDto, user.id),
     );
@@ -70,6 +76,40 @@ export class ItemsController {
     return this.queryBus.execute(
       new GetNonBiddedItemsQuery(name, startingPriceFrom, startingPriceTo),
     );
+  }
+
+  @Get('/pdf/:id')
+  @ApiOperation({ summary: 'Export item by ID to PDF' })
+  @ApiResponse({
+    status: 200,
+    description: 'The item PDF has been successfully generated and sent.',
+    content: { 'application/pdf': { schema: { type: 'string', format: 'binary' } } },
+  })
+  async getItemByIdExportPdf(
+    @Param('id', ParseUUIDPipe) id: Uuid,
+    @Res() res: Response,
+  ) {
+    const pdfBuffer: Buffer = await this.queryBus.execute(new GetItemByIdExportPdfQuery(id));
+    const filename = `item-${id}.pdf`;
+
+    this.sendPdfResponse(res, pdfBuffer, filename);
+  }
+
+  @Get(':userId/winning-bids/pdf')
+  @ApiOperation({ summary: 'Export winning bids by user ID to PDF' })
+  @ApiResponse({
+    status: 200,
+    description: 'The winning bids PDF has been successfully generated and sent.',
+    content: { 'application/pdf': { schema: { type: 'string', format: 'binary' } } },
+  })
+  async getWinningBidsByUserIdExportPdf(
+    @Param('userId', ParseUUIDPipe) userId: Uuid,
+    @Res() res: Response,
+  ) {
+    const pdfBuffer: Buffer = await this.queryBus.execute(new GetWinningBidsByUserIdExportPdfQuery(userId));
+    const filename = `winning-bids-${userId}.pdf`;
+
+    this.sendPdfResponse(res, pdfBuffer, filename);
   }
 
   @Get(':userId/winning-bids')
@@ -114,6 +154,17 @@ export class ItemsController {
     );
   }
 
+  @Get(':ownerId/owner')
+  @ApiOperation({ summary: 'Get items by owner ID' })
+  @ApiResponse({
+    status: 200,
+    description: 'The items have been successfully retrieved.',
+    type: [GetItemByIdResponseDto],
+  })
+  getItemsByOwnerId(@Param('ownerId', ParseUUIDPipe) ownerId: Uuid) {
+    return this.queryBus.execute(new GetItemsByOwnerIdQuery(ownerId));
+  }
+
   @Get(':id')
   @ApiOperation({ summary: 'Get item by ID' })
   @ApiResponse({
@@ -126,15 +177,18 @@ export class ItemsController {
     return this.queryBus.execute(new GetItemByIdQuery(id));
   }
 
-  @Get(':ownerId/owner')
-  @ApiOperation({ summary: 'Get items by owner ID' })
+  @Put(':id/lock')
+  @ApiOperation({ summary: 'Lock an item' })
   @ApiResponse({
     status: 200,
-    description: 'The items have been successfully retrieved.',
-    type: [GetItemByIdResponseDto],
+    description: 'The item has been successfully locked.',
   })
-  getItemsByOwnerId(@Param('ownerId', ParseUUIDPipe) ownerId: Uuid) {
-    return this.queryBus.execute(new GetItemsByOwnerIdQuery(ownerId));
+  @ApiResponse({ status: 400, description: 'Bad Request.' })
+  @ApiResponse({ status: 403, description: 'Forbidden.' })
+  @RequireLoggedIn()
+  @ApiBearerAuth()
+  lock(@Param('id', ParseUUIDPipe) id: Uuid, @AuthUser() user: UserEntity) {
+    return this.commandBus.execute(new LockItemCommand(id, user.id));
   }
 
   @Put(':id')
@@ -155,5 +209,14 @@ export class ItemsController {
     return this.commandBus.execute(
       ItemsMapper.fromUpdateItemRequestDto(id, updateItemRequestDto, user.id),
     );
+  }
+
+  private sendPdfResponse(res: Response, pdfBuffer: Buffer, filename: string) {
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Length': pdfBuffer.length,
+    });
+    res.send(pdfBuffer);
   }
 }
