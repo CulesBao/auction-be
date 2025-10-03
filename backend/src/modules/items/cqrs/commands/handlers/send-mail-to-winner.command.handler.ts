@@ -30,22 +30,17 @@ export class SendMailToWinnerCommandHandler implements ICommandHandler<SendMailT
 
                     if (!item) return;
 
-                    await manager.getRepository(ItemEntity).update(item.id, { isWinnerNotified: true });
-
-                    return item;
-                })
-            )
-        ).then(async (processedItems) => {
-            processedItems
-                .map((item: ItemEntity) =>
                     this.queryBus.execute(new SendMailWithTemplate(
                         item.winner.email,
                         `Congratulations! You won the auction for "${item.name}"`,
                         "notify-to-winner.hbs",
                         { ...this.filterData(item) }
-                    ))
-                );
-        });
+                    ));
+
+                    await manager.getRepository(ItemEntity).update(item.id, { isWinnerNotified: true });
+                })
+            )
+        )
 
         console.log(`[${now.toISOString()}] Sent ${rawItems.length} email(s) to winners.`);
     }
