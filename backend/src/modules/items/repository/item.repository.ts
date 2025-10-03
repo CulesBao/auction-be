@@ -83,16 +83,11 @@ export class ItemRepository {
   }
 
   async findItemsNotNotified(endTime: Date): Promise<ItemEntity[]> {
-    const items = await this.itemRepository.find({
-      where: {
-        endTime: LessThanOrEqual(endTime),
-        winnerId: Not(IsNull()),
-        isWinnerNotified: false,
-      },
-      relations: { owner: true, winner: true },
-    })
-
-    return items;
+    return await this.itemRepository.findBy({
+      endTime: LessThanOrEqual(endTime),
+      winnerId: Not(IsNull()),
+      isWinnerNotified: false,
+    });
   }
 
   async findWinningBidsByUserId(userId: Uuid): Promise<ItemEntity[]> {
