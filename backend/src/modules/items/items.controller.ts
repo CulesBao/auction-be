@@ -91,12 +91,8 @@ export class ItemsController {
   ) {
     const pdfBuffer: Buffer = await this.queryBus.execute(new GetItemByIdExportPdfQuery(id));
     const filename = `item-${id}.pdf`;
-    res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${filename}"`,
-      'Content-Length': pdfBuffer.length,
-    });
-    return res.send(pdfBuffer);
+
+    this.sendPdfResponse(res, pdfBuffer, filename);
   }
 
   @Get(':userId/winning-bids/pdf')
@@ -112,12 +108,8 @@ export class ItemsController {
   ) {
     const pdfBuffer: Buffer = await this.queryBus.execute(new GetWinningBidsByUserIdExportPdfQuery(userId));
     const filename = `winning-bids-${userId}.pdf`;
-    res.set({
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': `attachment; filename="${filename}"`,
-      'Content-Length': pdfBuffer.length,
-    });
-    return res.send(pdfBuffer);
+
+    this.sendPdfResponse(res, pdfBuffer, filename);
   }
 
   @Get(':userId/winning-bids')
@@ -217,5 +209,14 @@ export class ItemsController {
     return this.commandBus.execute(
       ItemsMapper.fromUpdateItemRequestDto(id, updateItemRequestDto, user.id),
     );
+  }
+
+  private sendPdfResponse(res: Response, pdfBuffer: Buffer, filename: string) {
+    res.set({
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment; filename="${filename}"`,
+      'Content-Length': pdfBuffer.length,
+    });
+    res.send(pdfBuffer);
   }
 }

@@ -17,15 +17,10 @@ export class GetItemByIdExportPdfQueryHandler implements IQueryHandler<GetItemBy
     async execute(query: GetItemByIdExportPdfQuery): Promise<Buffer> {
         const rawItem = await this.itemRepository.findByIdWithRelationsOrThrow(query.id);
 
-        const item = this.formatItem(rawItem);
-
-        const generatedAt = formatDateTime(new Date());
-        const reportId = uuidv4();
-
         const context = {
-            item,
-            generatedAt,
-            reportId,
+            item: this.formatItem(rawItem),
+            generatedAt: formatDateTime(new Date()),
+            reportId: uuidv4(),
         };
 
         const htmlPath = join(process.cwd(), 'src', 'templates', 'item-detail.html');
