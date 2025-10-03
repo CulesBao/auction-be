@@ -35,7 +35,13 @@ export class ItemRepository {
   async findByIdWithRelationsOrThrow(id: Uuid): Promise<ItemEntity> {
     const item = await this.itemRepository.findOne({
       where: { id },
-      relations: ['owner', 'bids', 'bids.user', 'winner'],
+      relations: {
+        owner: true,
+        winner: true,
+        bids: {
+          user: true,
+        },
+      },
     });
 
     if (!item) {
