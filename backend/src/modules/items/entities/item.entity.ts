@@ -56,4 +56,7 @@ export class ItemEntity {
 
   @OneToMany(() => BidEntity, (bid) => bid.item)
   bids: BidEntity[];
+
+  @Column({ type: 'boolean', default: false })
+  isWinnerNotified: boolean;
 }

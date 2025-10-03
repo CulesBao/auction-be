@@ -1,8 +1,8 @@
 import { MailerOptions } from '@nestjs-modules/mailer';
 import { HandlebarsAdapter } from '@nestjs-modules/mailer/dist/adapters/handlebars.adapter';
-import * as path from 'path';
 import { Injectable } from '@nestjs/common';
 import { ApiConfigService } from './api-config.service';
+import { join } from 'path';
 
 @Injectable()
 export class MailerConfigService {
@@ -23,7 +23,7 @@ export class MailerConfigService {
                 from: this.apiConfigService.stmpConfig.from,
             },
             template: {
-                dir: path.join(__dirname, '../../templates'),
+                dir: join(process.cwd(), 'src', 'templates'),
                 adapter: new HandlebarsAdapter(),
                 options: {
                     strict: true,

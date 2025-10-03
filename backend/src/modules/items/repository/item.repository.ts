@@ -1,6 +1,6 @@
 import { InjectRepository } from '@nestjs/typeorm';
 import { ItemEntity } from '../entities/item.entity';
-import { DataSource, IsNull, LessThan, Repository } from 'typeorm';
+import { DataSource, IsNull, LessThan, Not, Repository } from 'typeorm';
 import { Uuid } from 'common/types';
 import { NotFoundException } from '@nestjs/common';
 import { MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
@@ -79,6 +79,14 @@ export class ItemRepository {
               : undefined,
       winnerId: IsNull(),
       finalPrice: IsNull(),
+    });
+  }
+
+  async findItemsNotNotified(endTime: Date): Promise<ItemEntity[]> {
+    return await this.itemRepository.findBy({
+      endTime: LessThanOrEqual(endTime),
+      winnerId: Not(IsNull()),
+      isWinnerNotified: false,
     });
   }
 

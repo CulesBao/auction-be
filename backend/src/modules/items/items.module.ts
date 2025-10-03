@@ -15,8 +15,10 @@ import { GetRevenueByOwnerIdQueryHandler } from './cqrs/queries/handlers/get-rev
 import { GetWinningBidsByUserIdExportPdfQueryHandler } from './cqrs/queries/handlers/get-winning-bids-by-user-id-export-pdf.query.handler';
 import { GetItemByIdExportPdfQueryHandler } from './cqrs/queries/handlers/get-item-by-id-export-pdf.query.handler';
 import { LockItemCommandHandler } from './cqrs/commands/handlers/lock-item.command.handler';
+import { SendMailToWinnerSchedule } from './schedules/send-mail-to-winner.schedule';
+import { SendMailToWinnerCommandHandler } from './cqrs/commands/handlers/send-mail-to-winner.command.handler';
 
-const commandHandlers = [CreateItemCommandHandler, UpdateItemCommandHandler, LockItemCommandHandler];
+const commandHandlers = [CreateItemCommandHandler, UpdateItemCommandHandler, LockItemCommandHandler, SendMailToWinnerCommandHandler];
 const queryHandlers = [
   GetItemByIdQueryHandler,
   GetItemsByOwnerIdHandler,
@@ -30,7 +32,7 @@ const queryHandlers = [
 @Module({
   imports: [TypeOrmModule.forFeature([ItemEntity]), CqrsModule, UserModule],
   controllers: [ItemsController],
-  providers: [ItemRepository, ...commandHandlers, ...queryHandlers],
+  providers: [ItemRepository, ...commandHandlers, ...queryHandlers, SendMailToWinnerSchedule],
   exports: [ItemRepository],
 })
 export class ItemsModule { }
