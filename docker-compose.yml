@@ -8,7 +8,6 @@ services:
     environment:
       DB_HOST: database
       KEYCLOAK_BASE_URL: http://keycloak:8080
-    restart: always
     ports:
       - "$PORT:$PORT"
     depends_on:
@@ -19,7 +18,6 @@ services:
 
   database:
     build: postgres
-    restart: always
     container_name: database
     volumes:
     - ./postgres:/docker-entrypoint-initdb.d
