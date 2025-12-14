@@ -18,6 +18,8 @@ async function bootstrap() {
     exclude: [{ path: "health", method: RequestMethod.GET }],
   });
 
+  app.enableCors();
+
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,
