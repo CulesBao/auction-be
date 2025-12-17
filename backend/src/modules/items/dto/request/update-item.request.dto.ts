@@ -1,16 +1,16 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty } from "@nestjs/swagger";
 import {
   IsDateString,
   IsNotEmpty,
   IsNumber,
   IsPositive,
   IsString,
-} from 'class-validator';
+} from "class-validator";
 
 export class UpdateItemRequestDto {
   @ApiProperty({
-    example: 'item name',
-    description: 'Name of the item',
+    example: "item name",
+    description: "Name of the item",
     required: true,
   })
   @IsNotEmpty()
@@ -18,8 +18,8 @@ export class UpdateItemRequestDto {
   name: string;
 
   @ApiProperty({
-    example: 'item description',
-    description: 'Description of the item',
+    example: "item description",
+    description: "Description of the item",
     required: true,
   })
   @IsString()
@@ -27,7 +27,7 @@ export class UpdateItemRequestDto {
 
   @ApiProperty({
     example: 100,
-    description: 'Starting price of the item',
+    description: "Starting price of the item",
     required: true,
   })
   @IsNotEmpty()
@@ -36,8 +36,8 @@ export class UpdateItemRequestDto {
   startingPrice: number;
 
   @ApiProperty({
-    example: '2026-10-01T10:00:00Z',
-    description: 'Start time of the auction',
+    example: "2026-10-01T10:00:00Z",
+    description: "Start time of the auction",
     required: true,
   })
   @IsNotEmpty()
@@ -45,8 +45,8 @@ export class UpdateItemRequestDto {
   startTime: Date;
 
   @ApiProperty({
-    example: '2026-10-07T10:00:00Z',
-    description: 'End time of the auction',
+    example: "2026-10-07T10:00:00Z",
+    description: "End time of the auction",
     required: true,
   })
   @IsNotEmpty()

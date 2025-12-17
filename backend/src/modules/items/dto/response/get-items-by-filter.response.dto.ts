@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Uuid } from "common/types";
 import { ItemEntity } from "../../entities/item.entity";
 
-export class GetItemByIdResponseDto {
+export class GetItemsByFilterResponseDto {
   @ApiProperty({
     example: "550e8400-e29b-41d4-a716-446655440000",
     description: "The unique identifier of the item",
@@ -28,6 +28,12 @@ export class GetItemByIdResponseDto {
   readonly ownerId: Uuid;
 
   @ApiProperty({
+    example: "Bao",
+    description: "The owner name of the item",
+  })
+  readonly ownerName: string;
+
+  @ApiProperty({
     example: 100.0,
     description: "The starting price of the item",
   })
@@ -46,6 +52,27 @@ export class GetItemByIdResponseDto {
   readonly endTime: Date;
 
   @ApiProperty({
+    example: 250.0,
+    description: "The final price of the item after auction ends",
+    nullable: true,
+  })
+  readonly finalPrice: number | null;
+
+  @ApiProperty({
+    example: "550e8400-e29b-41d4-a716-446655440000",
+    description: "The unique identifier of the winner",
+    nullable: true,
+  })
+  readonly winnerId: Uuid | null;
+
+  @ApiProperty({
+    example: "Bao",
+    description: "The winner name of the item",
+    nullable: true,
+  })
+  readonly winnerName: string | null;
+
+  @ApiProperty({
     example: "2023-10-01T10:00:00Z",
     description: "The date and time when the item was created",
   })
@@ -57,17 +84,27 @@ export class GetItemByIdResponseDto {
   })
   readonly updatedAt: Date;
 
-  static fromEntity(entity: ItemEntity): GetItemByIdResponseDto {
+  static fromEntity(entity: ItemEntity): GetItemsByFilterResponseDto {
     return {
       id: entity.id,
       name: entity.name,
       description: entity.description,
       ownerId: entity.ownerId,
+      ownerName: entity.owner.firstName + " " + entity.owner.lastName,
       startingPrice: entity.startingPrice,
       startTime: entity.startTime,
       endTime: entity.endTime,
+      finalPrice: entity.finalPrice,
+      winnerId: entity.winnerId,
+      winnerName: entity.winner
+        ? entity.winner.firstName + " " + entity.winner.lastName
+        : null,
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     };
+  }
+
+  static fromEntities(entities: ItemEntity[]): GetItemsByFilterResponseDto[] {
+    return entities.map((entity) => this.fromEntity(entity));
   }
 }

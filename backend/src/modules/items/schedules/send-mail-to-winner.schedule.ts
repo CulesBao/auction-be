@@ -5,11 +5,10 @@ import { SendMailToWinnerCommand } from "../cqrs/commands/implements/send-mail-t
 
 @Injectable()
 export class SendMailToWinnerSchedule {
-    constructor(private readonly commandBus: CommandBus) { }
+  constructor(private readonly commandBus: CommandBus) {}
 
-    @Cron(CronExpression.EVERY_MINUTE)
-    async handleCron() {
-        await this.commandBus.execute(new SendMailToWinnerCommand())
-    }
-
+  @Cron(CronExpression.EVERY_MINUTE)
+  async handleCron() {
+    await this.commandBus.execute(new SendMailToWinnerCommand());
+  }
 }

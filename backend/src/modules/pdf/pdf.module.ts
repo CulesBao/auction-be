@@ -1,6 +1,6 @@
-import { Module } from '@nestjs/common';
-import { PdfConfigService } from 'shared/services/pdf-config.service';
-import { CreatePdfQueryHandler } from './cqrs/queries/handlers/create-pdf.query.handler';
+import { Module } from "@nestjs/common";
+import { PdfConfigService } from "shared/services/pdf-config.service";
+import { CreatePdfQueryHandler } from "./cqrs/queries/handlers/create-pdf.query.handler";
 
 const queries = [CreatePdfQueryHandler];
 
@@ -9,4 +9,4 @@ const queries = [CreatePdfQueryHandler];
   providers: [PdfConfigService, ...queries],
   exports: [...queries],
 })
-export class PdfModule { }
+export class PdfModule {}

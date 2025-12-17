@@ -1,16 +1,16 @@
-import { InjectRepository } from '@nestjs/typeorm';
-import { ItemEntity } from '../entities/item.entity';
-import { DataSource, IsNull, LessThan, Not, Repository } from 'typeorm';
-import { Uuid } from 'common/types';
-import { NotFoundException } from '@nestjs/common';
-import { MoreThanOrEqual, LessThanOrEqual } from 'typeorm';
+import { InjectRepository } from "@nestjs/typeorm";
+import { ItemEntity } from "../entities/item.entity";
+import { DataSource, IsNull, LessThan, Like, Not, Repository } from "typeorm";
+import { Uuid } from "common/types";
+import { NotFoundException } from "@nestjs/common";
+import { MoreThanOrEqual, LessThanOrEqual } from "typeorm";
 
 export class ItemRepository {
   constructor(
     @InjectRepository(ItemEntity)
     private readonly itemRepository: Repository<ItemEntity>,
     private readonly dataSource: DataSource,
-  ) { }
+  ) {}
 
   async create(item: Partial<ItemEntity>): Promise<ItemEntity> {
     return await this.itemRepository.save(this.itemRepository.create(item));
@@ -67,11 +67,11 @@ export class ItemRepository {
     startingPriceTo: number | undefined,
   ): Promise<ItemEntity[]> {
     return await this.itemRepository.findBy({
-      name: name ? `%${name}%` : undefined,
+      name: name ? Like(`%${name}%`) : undefined,
       startingPrice:
         startingPriceFrom && startingPriceTo
           ? MoreThanOrEqual(startingPriceFrom) &&
-          LessThanOrEqual(startingPriceTo)
+            LessThanOrEqual(startingPriceTo)
           : startingPriceFrom
             ? MoreThanOrEqual(startingPriceFrom)
             : startingPriceTo
@@ -79,6 +79,39 @@ export class ItemRepository {
               : undefined,
       winnerId: IsNull(),
       finalPrice: IsNull(),
+    });
+  }
+
+  async findItemsByFilter(
+    name: string | undefined,
+    ownerName: string | undefined,
+    startTime: Date | undefined,
+    endTime: Date | undefined,
+    startingPriceFrom: number | undefined,
+    startingPriceTo: number | undefined,
+  ): Promise<ItemEntity[]> {
+    return await this.itemRepository.find({
+      where: {
+        name: name ? Like(`%${name}%`) : undefined,
+        owner: ownerName
+          ? [
+              { firstName: Like(`%${ownerName}%`) },
+              { lastName: Like(`%${ownerName}%`) },
+            ]
+          : undefined,
+        startTime: startTime ? MoreThanOrEqual(startTime) : undefined,
+        endTime: endTime ? LessThanOrEqual(endTime) : undefined,
+        startingPrice:
+          startingPriceFrom && startingPriceTo
+            ? MoreThanOrEqual(startingPriceFrom) &&
+              LessThanOrEqual(startingPriceTo)
+            : startingPriceFrom
+              ? MoreThanOrEqual(startingPriceFrom)
+              : startingPriceTo
+                ? LessThanOrEqual(startingPriceTo)
+                : undefined,
+      },
+      relations: ["owner"],
     });
   }
 
@@ -104,21 +137,21 @@ export class ItemRepository {
   ): Promise<number | null> {
     const revenue: number | null = await this.dataSource
       .getRepository(ItemEntity)
-      .createQueryBuilder('item')
-      .select('SUM(item.finalPrice)', 'revenue')
-      .where('item.ownerId = :ownerId', { ownerId })
-      .andWhere('item.endTime BETWEEN :startDate AND :endDate', {
+      .createQueryBuilder("item")
+      .select("SUM(item.finalPrice)", "revenue")
+      .where("item.ownerId = :ownerId", { ownerId })
+      .andWhere("item.endTime BETWEEN :startDate AND :endDate", {
         startDate,
         endDate,
       })
-      .andWhere('item.finalPrice IS NOT NULL')
+      .andWhere("item.finalPrice IS NOT NULL")
       .getRawOne<{ revenue: string | null }>()
       .then(
         (
           result:
             | {
-              revenue: string | null;
-            }
+                revenue: string | null;
+              }
             | undefined,
         ) => {
           if (result && result.revenue !== null) {

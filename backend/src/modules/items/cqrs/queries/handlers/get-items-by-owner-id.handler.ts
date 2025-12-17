@@ -1,16 +1,17 @@
-import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { GetItemsByOwnerIdQuery } from '../implements/get-items-by-owner-id.query';
-import { Inject } from '@nestjs/common';
-import { ItemRepository } from 'modules/items/repository/item.repository';
-import { GetItemsByOwnerIdResponseDto } from 'modules/items/dto/response/get-items-by-owner-id.response.dto';
+import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
+import { GetItemsByOwnerIdQuery } from "../implements/get-items-by-owner-id.query";
+import { Inject } from "@nestjs/common";
+import { ItemRepository } from "modules/items/repository/item.repository";
+import { GetItemsByOwnerIdResponseDto } from "modules/items/dto/response/get-items-by-owner-id.response.dto";
 
 @QueryHandler(GetItemsByOwnerIdQuery)
 export class GetItemsByOwnerIdHandler
-  implements IQueryHandler<GetItemsByOwnerIdQuery> {
+  implements IQueryHandler<GetItemsByOwnerIdQuery>
+{
   constructor(
     @Inject(ItemRepository)
     private readonly itemRepository: ItemRepository,
-  ) { }
+  ) {}
   async execute(
     query: GetItemsByOwnerIdQuery,
   ): Promise<GetItemsByOwnerIdResponseDto[]> {

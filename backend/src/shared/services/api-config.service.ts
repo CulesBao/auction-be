@@ -8,7 +8,7 @@ export interface IBlobConfig {
 
 @Injectable()
 export class ApiConfigService {
-  constructor(private configService: ConfigService) { }
+  constructor(private configService: ConfigService) {}
 
   get apiDomain(): string {
     return this.getString("API_DOMAIN");
@@ -35,7 +35,7 @@ export class ApiConfigService {
       user: this.getString("MAIL_USER"),
       pass: this.getString("MAIL_PASS"),
       from: this.getString("MAIL_FROM"),
-    }
+    };
   }
 
   get keycloakConfig() {
@@ -107,8 +107,8 @@ export class ApiConfigService {
     }
     return value
       .split(",")
-      .map(v => v.trim())
-      .filter(v => v.length > 0);
+      .map((v) => v.trim())
+      .filter((v) => v.length > 0);
   }
 
   private getNumber(key: string): number {

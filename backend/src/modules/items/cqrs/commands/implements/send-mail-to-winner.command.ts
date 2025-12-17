@@ -1,3 +1,3 @@
 export class SendMailToWinnerCommand {
-    constructor() { }
+  constructor() {}
 }

@@ -3,17 +3,19 @@ import { SendMailWithTemplate } from "../implements/send-mail-with-template.quer
 import { MailerService } from "@nestjs-modules/mailer";
 
 @QueryHandler(SendMailWithTemplate)
-export class SendMailWithTemplateQueryHandler implements IQueryHandler<SendMailWithTemplate> {
-    constructor(private readonly mailerService: MailerService) { }
+export class SendMailWithTemplateQueryHandler
+  implements IQueryHandler<SendMailWithTemplate>
+{
+  constructor(private readonly mailerService: MailerService) {}
 
-    async execute(query: SendMailWithTemplate): Promise<void> {
-        const { to, subject, templateFilePath, data } = query;
+  async execute(query: SendMailWithTemplate): Promise<void> {
+    const { to, subject, templateFilePath, data } = query;
 
-        await this.mailerService.sendMail({
-            to,
-            subject,
-            template: templateFilePath,
-            context: data,
-        });
-    }
+    await this.mailerService.sendMail({
+      to,
+      subject,
+      template: templateFilePath,
+      context: data,
+    });
+  }
 }

@@ -1,5 +1,5 @@
-import { ICommand } from '@nestjs/cqrs';
-import { Uuid } from 'common/types';
+import { ICommand } from "@nestjs/cqrs";
+import { Uuid } from "common/types";
 
 export class UpdateItemCommand implements ICommand {
   constructor(
@@ -10,5 +10,5 @@ export class UpdateItemCommand implements ICommand {
     public readonly startTime: Date,
     public readonly endTime: Date,
     public readonly ownerId: Uuid,
-  ) { }
+  ) {}
 }

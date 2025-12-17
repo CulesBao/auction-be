@@ -1,6 +1,5 @@
-import { ForbiddenException } from '@nestjs/common';
-import { Uuid } from 'common/types';
-
+import { ForbiddenException } from "@nestjs/common";
+import { Uuid } from "common/types";
 
 export class BidDomainValidation {
   static ensureBiddingPeriodValid(startTime: Date, endTime: Date) {

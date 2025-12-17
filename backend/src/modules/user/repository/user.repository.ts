@@ -1,15 +1,15 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { UserEntity } from '../entities/user.entity';
-import { Repository } from 'typeorm';
-import { Uuid } from 'common/types';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { UserEntity } from "../entities/user.entity";
+import { Repository } from "typeorm";
+import { Uuid } from "common/types";
 
 @Injectable()
 export class UserRepository {
   constructor(
     @InjectRepository(UserEntity)
     private readonly userRepository: Repository<UserEntity>,
-  ) { }
+  ) {}
 
   async create(user: Partial<UserEntity>): Promise<UserEntity> {
     return await this.userRepository.save(this.userRepository.create(user));

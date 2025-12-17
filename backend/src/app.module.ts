@@ -9,7 +9,7 @@ import { ServeStaticModule } from "@nestjs/serve-static";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
 import { addTransactionalDataSource } from "typeorm-transactional";
-import { CqrsModule } from '@nestjs/cqrs';
+import { CqrsModule } from "@nestjs/cqrs";
 import { TypeOrmConfigService } from "./database/typeorm-config.service";
 import { JwtAuthGuard } from "./decorator/jwt-auth-guard";
 import { LoggingExceptionFilter } from "./filter/error-handling-exception-filter";
@@ -21,10 +21,10 @@ import { ApiConfigService } from "./shared/services/api-config.service";
 import { SharedModule } from "./shared/shared.module";
 import { ItemsModule } from "modules/items/items.module";
 import { BidsModule } from "modules/bids/bids.module";
-import { PdfModule } from './modules/pdf/pdf.module';
+import { PdfModule } from "./modules/pdf/pdf.module";
 import { MailerModule } from "@nestjs-modules/mailer";
 import { MailerConfigService } from "shared/services/mailer-config.service";
-import { MailModule } from './modules/mail/mail.module';
+import { MailModule } from "./modules/mail/mail.module";
 import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
@@ -64,11 +64,12 @@ import { ScheduleModule } from "@nestjs/schedule";
     BidsModule,
     PdfModule,
     MailerModule.forRootAsync({
-      useFactory: (mailerConfigService: MailerConfigService) => mailerConfigService.mailerConfig(),
+      useFactory: (mailerConfigService: MailerConfigService) =>
+        mailerConfigService.mailerConfig(),
       inject: [MailerConfigService],
     }),
     MailModule,
-    ScheduleModule.forRoot()
+    ScheduleModule.forRoot(),
   ],
   providers: [
     {
@@ -85,4 +86,4 @@ import { ScheduleModule } from "@nestjs/schedule";
     },
   ],
 })
-export class AppModule { }
+export class AppModule {}

@@ -1,6 +1,11 @@
 import { Body, Controller, Get, Post } from "@nestjs/common";
 import { RegisterFormDto } from "./dto/register-form.dto";
-import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from "@nestjs/swagger";
 import { AuthService } from "./auth.service";
 import { LoginFormDto } from "./dto/login-form.dto";
 import { AuthUser } from "../../decorator/auth-user.decorator";
@@ -19,7 +24,7 @@ export class AuthController {
   constructor(
     private readonly authService: AuthService,
     private readonly appleAuthService: AppleAuthService,
-  ) { }
+  ) {}
 
   @Post("register")
   @ApiOperation({ summary: "Register a new user" })
