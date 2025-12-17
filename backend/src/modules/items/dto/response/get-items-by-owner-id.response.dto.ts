@@ -29,9 +29,15 @@ export class GetItemsByOwnerIdResponseDto {
 
   @ApiProperty({
     example: 100.0,
-    description: "The starting price of the item",
+    description: "The current price of the item",
   })
-  readonly startingPrice: number;
+  readonly currentPrice: number;
+
+  @ApiProperty({
+    example: 2,
+    description: "The number of bids placed on the item",
+  })
+  readonly bidsCount: number;
 
   @ApiProperty({
     example: "2023-10-01T10:00:00Z",
@@ -63,7 +69,9 @@ export class GetItemsByOwnerIdResponseDto {
       name: entity.name,
       description: entity.description,
       ownerId: entity.ownerId,
-      startingPrice: entity.startingPrice,
+      currentPrice:
+        entity.bids[entity.bids.length - 1]?.price || entity.startingPrice,
+      bidsCount: entity.bids.length,
       startTime: entity.startTime,
       endTime: entity.endTime,
       createdAt: entity.createdAt,

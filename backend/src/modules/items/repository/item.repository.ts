@@ -54,7 +54,12 @@ export class ItemRepository {
   }
 
   async findByOwnerId(ownerId: Uuid): Promise<ItemEntity[]> {
-    return await this.itemRepository.findBy({ ownerId });
+    return await this.itemRepository.find({
+      where: { ownerId },
+      relations: {
+        bids: true,
+      },
+    });
   }
 
   async update(id: Uuid, updateData: Partial<ItemEntity>): Promise<void> {
