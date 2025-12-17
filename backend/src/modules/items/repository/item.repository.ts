@@ -111,7 +111,10 @@ export class ItemRepository {
                 ? LessThanOrEqual(startingPriceTo)
                 : undefined,
       },
-      relations: ["owner"],
+      relations: {
+        owner: true,
+        winner: true,
+      },
     });
   }
 

@@ -1,7 +1,6 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Uuid } from "common/types";
 import { ItemEntity } from "../../entities/item.entity";
-import { GetItemByIdResponseDto } from "./get-item-by-id.response.dto";
 
 export class GetItemsByOwnerIdResponseDto {
   @ApiProperty({
@@ -58,7 +57,7 @@ export class GetItemsByOwnerIdResponseDto {
   })
   readonly updatedAt: Date;
 
-  static fromEntity(entity: ItemEntity): GetItemByIdResponseDto {
+  static fromEntity(entity: ItemEntity): GetItemsByOwnerIdResponseDto {
     return {
       id: entity.id,
       name: entity.name,

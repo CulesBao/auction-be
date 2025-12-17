@@ -14,7 +14,9 @@ export class GetItemByIdQueryHandler
   ) {}
 
   async execute(query: GetItemByIdQuery): Promise<GetItemByIdResponseDto> {
-    const item = await this.itemRepository.findByIdOrThrow(query.id);
+    const item = await this.itemRepository.findByIdWithRelationsOrThrow(
+      query.id,
+    );
 
     return GetItemByIdResponseDto.fromEntity(item);
   }

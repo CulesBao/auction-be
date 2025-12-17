@@ -1,6 +1,53 @@
 import { ApiProperty } from "@nestjs/swagger";
 import { Uuid } from "common/types";
 import { ItemEntity } from "../../entities/item.entity";
+import { BidEntity } from "modules/bids/entities/bid.entity";
+
+class BidHistoryDto {
+  @ApiProperty({
+    example: "bbbb2222-cccc-3333-dddd-4444eeee5555",
+    description: "The unique identifier of the bid",
+  })
+  readonly id: Uuid;
+
+  @ApiProperty({
+    example: 150.0,
+    description: "The price of the bid",
+  })
+  readonly price: number;
+
+  @ApiProperty({
+    example: "2023-10-02T12:00:00Z",
+    description: "The date and time when the bid was created",
+  })
+  readonly createdAt: Date;
+
+  @ApiProperty({
+    example: "cccc3333-dddd-4444-eeee-5555ffff6666",
+    description: "The unique identifier of the user who placed the bid",
+  })
+  readonly userId: Uuid;
+
+  @ApiProperty({
+    example: "Le Thi B",
+    description: "The name of the user who placed the bid",
+  })
+  readonly userName: string;
+
+  static fromEntity(entity: BidEntity): BidHistoryDto {
+    return {
+      id: entity.id,
+      price: entity.price,
+      createdAt: entity.createdAt,
+      userId: entity.userId,
+      userName: entity.user.firstName + " " + entity.user.lastName,
+    };
+  }
+
+  static fromEntities(entities: BidEntity[]): BidHistoryDto[] {
+    return entities.map((entity) => this.fromEntity(entity));
+  }
+}
 
 export class GetItemByIdResponseDto {
   @ApiProperty({
@@ -28,6 +75,12 @@ export class GetItemByIdResponseDto {
   readonly ownerId: Uuid;
 
   @ApiProperty({
+    example: "Bao Duong",
+    description: "The name of the owner",
+  })
+  readonly ownerName: string;
+
+  @ApiProperty({
     example: 100.0,
     description: "The starting price of the item",
   })
@@ -44,6 +97,30 @@ export class GetItemByIdResponseDto {
     description: "The end date and time of the auction",
   })
   readonly endTime: Date;
+
+  @ApiProperty({
+    example: "aaaa1111-bbbb-2222-cccc-3333dddd4444",
+    description: "The unique identifier of the winner",
+  })
+  readonly winnerId: Uuid | null;
+
+  @ApiProperty({
+    example: "Nguyen Van A",
+    description: "The name of the winner",
+  })
+  readonly winnerName: string | null;
+
+  @ApiProperty({
+    example: 250.0,
+    description: "The final price of the item",
+  })
+  readonly finalPrice: number | null;
+
+  @ApiProperty({
+    example: [],
+    description: "The bid history of the item",
+  })
+  readonly bidHistory: BidHistoryDto[];
 
   @ApiProperty({
     example: "2023-10-01T10:00:00Z",
@@ -63,9 +140,16 @@ export class GetItemByIdResponseDto {
       name: entity.name,
       description: entity.description,
       ownerId: entity.ownerId,
+      ownerName: entity.owner.firstName + " " + entity.owner.lastName,
       startingPrice: entity.startingPrice,
       startTime: entity.startTime,
       endTime: entity.endTime,
+      winnerId: entity.winnerId,
+      winnerName: entity.winner
+        ? entity.winner.firstName + " " + entity.winner.lastName
+        : null,
+      finalPrice: entity.finalPrice,
+      bidHistory: BidHistoryDto.fromEntities(entity.bids),
       createdAt: entity.createdAt,
       updatedAt: entity.updatedAt,
     };
