@@ -6,7 +6,7 @@ import { join } from "path";
 
 @Injectable()
 export class MailerConfigService {
-  constructor(private readonly apiConfigService: ApiConfigService) { }
+  constructor(private readonly apiConfigService: ApiConfigService) {}
 
   mailerConfig(): MailerOptions {
     return {

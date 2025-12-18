@@ -18,6 +18,7 @@ import { LockItemCommandHandler } from "./cqrs/commands/handlers/lock-item.comma
 import { SendMailToWinnerSchedule } from "./schedules/send-mail-to-winner.schedule";
 import { SendMailToWinnerCommandHandler } from "./cqrs/commands/handlers/send-mail-to-winner.command.handler";
 import { GetItemsByFilterQueryHandler } from "./cqrs/queries/handlers/get-items-by-filter.query.handler";
+import { GetStatisticByUserIdQueryHandler } from "./cqrs/queries/handlers/get-statistic-by-user-id.query.handler";
 
 const commandHandlers = [
   CreateItemCommandHandler,
@@ -34,6 +35,7 @@ const queryHandlers = [
   GetWinningBidsByUserIdExportPdfQueryHandler,
   GetItemByIdExportPdfQueryHandler,
   GetItemsByFilterQueryHandler,
+  GetStatisticByUserIdQueryHandler,
 ];
 
 @Module({

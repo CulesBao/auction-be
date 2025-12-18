@@ -39,6 +39,8 @@ import { GetItemByIdExportPdfQuery } from "./cqrs/queries/implements/get-item-by
 import { LockItemCommand } from "./cqrs/commands/implements/lock-item.command";
 import { GetItemsByFilterQuery } from "./cqrs/queries/implements/get-items-by-filter.query";
 import { GetItemsByFilterResponseDto } from "./dto/response/get-items-by-filter.response.dto";
+import { GetStatisticByUserIdResponseDto } from "./dto/response/get-statistic-by-user-id.response.dto";
+import { GetStatisticByUserIdQuery } from "./cqrs/queries/implements/get-statistic-by-user-id.query";
 
 @Controller("items")
 @ApiTags("items")
@@ -138,6 +140,35 @@ export class ItemsController {
   })
   getWinningBidsByUserId(@Param("userId", ParseUUIDPipe) userId: Uuid) {
     return this.queryBus.execute(new GetWinningBidsByUserIdQuery(userId));
+  }
+
+  @Get("me/statistics")
+  @ApiOperation({ summary: "Get statistics for the logged-in user's items" })
+  @ApiResponse({
+    status: 200,
+    description: "The statistics have been successfully retrieved.",
+    type: GetStatisticByUserIdResponseDto,
+  })
+  @ApiQuery({
+    name: "startDate",
+    required: true,
+    description: "Start date in ISO format (e.g., 2023-01-01)",
+  })
+  @ApiQuery({
+    name: "endDate",
+    required: true,
+    description: "End date in ISO format (e.g., 2023-12-31)",
+  })
+  @RequireLoggedIn()
+  @ApiBearerAuth()
+  async getStatisticsForLoggedInUser(
+    @AuthUser() user: UserEntity,
+    @Query("startDate") startDate: Date,
+    @Query("endDate") endDate: Date,
+  ) {
+    return this.queryBus.execute(
+      new GetStatisticByUserIdQuery(user.id, startDate, endDate),
+    );
   }
 
   @Get("filters")

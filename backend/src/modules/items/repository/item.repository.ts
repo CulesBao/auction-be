@@ -4,13 +4,14 @@ import { DataSource, IsNull, LessThan, Like, Not, Repository } from "typeorm";
 import { Uuid } from "common/types";
 import { NotFoundException } from "@nestjs/common";
 import { MoreThanOrEqual, LessThanOrEqual } from "typeorm";
+import { GetStatisticByUserIdDto } from "../dto/get-statitstic-by-user-id.dto";
 
 export class ItemRepository {
   constructor(
     @InjectRepository(ItemEntity)
     private readonly itemRepository: Repository<ItemEntity>,
     private readonly dataSource: DataSource,
-  ) { }
+  ) {}
 
   async create(item: Partial<ItemEntity>): Promise<ItemEntity> {
     return await this.itemRepository.save(this.itemRepository.create(item));
@@ -76,7 +77,7 @@ export class ItemRepository {
       startingPrice:
         startingPriceFrom && startingPriceTo
           ? MoreThanOrEqual(startingPriceFrom) &&
-          LessThanOrEqual(startingPriceTo)
+            LessThanOrEqual(startingPriceTo)
           : startingPriceFrom
             ? MoreThanOrEqual(startingPriceFrom)
             : startingPriceTo
@@ -100,16 +101,16 @@ export class ItemRepository {
         name: name ? Like(`%${name}%`) : undefined,
         owner: ownerName
           ? [
-            { firstName: Like(`%${ownerName}%`) },
-            { lastName: Like(`%${ownerName}%`) },
-          ]
+              { firstName: Like(`%${ownerName}%`) },
+              { lastName: Like(`%${ownerName}%`) },
+            ]
           : undefined,
         startTime: startTime ? MoreThanOrEqual(startTime) : undefined,
         endTime: endTime ? LessThanOrEqual(endTime) : undefined,
         startingPrice:
           startingPriceFrom && startingPriceTo
             ? MoreThanOrEqual(startingPriceFrom) &&
-            LessThanOrEqual(startingPriceTo)
+              LessThanOrEqual(startingPriceTo)
             : startingPriceFrom
               ? MoreThanOrEqual(startingPriceFrom)
               : startingPriceTo
@@ -164,8 +165,8 @@ export class ItemRepository {
         (
           result:
             | {
-              revenue: string | null;
-            }
+                revenue: string | null;
+              }
             | undefined,
         ) => {
           if (result && result.revenue !== null) {
@@ -176,5 +177,155 @@ export class ItemRepository {
       );
 
     return revenue;
+  }
+
+  async getStatisticByUserId(
+    userId: Uuid,
+    startDate: Date,
+    endDate: Date,
+  ): Promise<GetStatisticByUserIdDto> {
+    const monthlyRevenueRaw = this.itemRepository
+      .createQueryBuilder("item")
+      .where("item.ownerId = :userId", { userId })
+      .andWhere("item.endTime BETWEEN :startDate AND :endDate", {
+        startDate,
+        endDate,
+      })
+      .andWhere("item.finalPrice IS NOT NULL")
+      .select("TO_CHAR(item.endTime, 'YYYY-MM')", "month")
+      .addSelect("SUM(item.finalPrice)", "revenue")
+      .addSelect("COUNT(item.id)", "itemSold")
+      .groupBy("TO_CHAR(item.endTime, 'YYYY-MM')");
+
+    const revenueRaw = this.itemRepository
+      .createQueryBuilder("item")
+      .where("item.ownerId = :userId", { userId })
+      .andWhere("item.endTime BETWEEN :startDate AND :endDate", {
+        startDate,
+        endDate,
+      })
+      .andWhere("item.finalPrice IS NOT NULL")
+      .select("SUM(item.finalPrice)", "totalRevenue")
+      .addSelect("COUNT(item.id)", "totalItemsSold");
+
+    const monthlySpendingRaw = this.itemRepository
+      .createQueryBuilder("item")
+      .where("item.winnerId = :userId", { userId })
+      .andWhere("item.endTime BETWEEN :startDate AND :endDate", {
+        startDate,
+        endDate,
+      })
+      .andWhere("item.finalPrice IS NOT NULL")
+      .select("TO_CHAR(item.endTime, 'YYYY-MM')", "month")
+      .addSelect("SUM(item.finalPrice)", "spending")
+      .addSelect("COUNT(item.id)", "itemsWon")
+      .groupBy("TO_CHAR(item.endTime, 'YYYY-MM')");
+
+    const spendingRaw = this.itemRepository
+      .createQueryBuilder("item")
+      .where("item.winnerId = :userId", { userId })
+      .andWhere("item.endTime BETWEEN :startDate AND :endDate", {
+        startDate,
+        endDate,
+      })
+      .andWhere("item.finalPrice IS NOT NULL")
+      .select("SUM(item.finalPrice)", "totalSpending")
+      .addSelect("COUNT(item.id)", "totalItemsWon");
+
+    const monthlyBidsRaw = this.itemRepository
+      .createQueryBuilder("item")
+      .leftJoin("item.bids", "bid")
+      .where("bid.userId = :userId", { userId })
+      .andWhere("item.endTime BETWEEN :startDate AND :endDate", {
+        startDate,
+        endDate,
+      })
+      .select("TO_CHAR(item.endTime, 'YYYY-MM')", "month")
+      .addSelect("COUNT(bid.id)", "bidsPlaced")
+      .groupBy("TO_CHAR(item.endTime, 'YYYY-MM')");
+
+    const bidsRaw = this.itemRepository
+      .createQueryBuilder("item")
+      .leftJoin("item.bids", "bid")
+      .where("bid.userId = :userId", { userId })
+      .andWhere("item.endTime BETWEEN :startDate AND :endDate", {
+        startDate,
+        endDate,
+      })
+      .select("COUNT(bid.id)", "totalBidsPlaced");
+
+    const [
+      monthlyRevenue,
+      monthlySpending,
+      monthlyBids,
+      revenueResult,
+      spendingResult,
+      bidsResult,
+    ] = await Promise.all([
+      monthlyRevenueRaw.getRawMany(),
+      monthlySpendingRaw.getRawMany(),
+      monthlyBidsRaw.getRawMany(),
+      revenueRaw.getRawOne(),
+      spendingRaw.getRawOne(),
+      bidsRaw.getRawOne(),
+    ]);
+
+    // Generate all months in the date range
+    const monthlyMap = new Map<string, any>();
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const current = new Date(start.getFullYear(), start.getMonth(), 1);
+    const endMonth = new Date(end.getFullYear(), end.getMonth(), 1);
+
+    while (current <= endMonth) {
+      const monthKey = `${current.getFullYear()}-${String(current.getMonth() + 1).padStart(2, "0")}`;
+      monthlyMap.set(monthKey, {
+        month: monthKey,
+        revenue: 0,
+        itemSold: 0,
+        spending: 0,
+        itemsWon: 0,
+        bidsPlaced: 0,
+      });
+      current.setMonth(current.getMonth() + 1);
+    }
+
+    // Merge monthly data
+    monthlyRevenue.forEach((item: any) => {
+      const existing = monthlyMap.get(item.month);
+      if (existing) {
+        existing.revenue = parseFloat(item.revenue) || 0;
+        existing.itemSold = parseInt(item.itemSold) || 0;
+      }
+    });
+
+    monthlySpending.forEach((item: any) => {
+      const existing = monthlyMap.get(item.month);
+      if (existing) {
+        existing.spending = parseFloat(item.spending) || 0;
+        existing.itemsWon = parseInt(item.itemsWon) || 0;
+      }
+    });
+
+    monthlyBids.forEach((item: any) => {
+      const existing = monthlyMap.get(item.month);
+      if (existing) {
+        existing.bidsPlaced = parseInt(item.bidsPlaced) || 0;
+      }
+    });
+
+    const monthlySalesReports = Array.from(monthlyMap.values()).sort((a, b) =>
+      a.month.localeCompare(b.month),
+    );
+
+    return {
+      monthlySalesReports,
+      totalRevenue: parseFloat(revenueResult?.totalRevenue) || 0,
+      totalItemsSold: parseInt(revenueResult?.totalItemsSold) || 0,
+      totalSpending: parseFloat(spendingResult?.totalSpending) || 0,
+      totalItemsWon: parseInt(spendingResult?.totalItemsWon) || 0,
+      totalBidsPlaced: parseInt(bidsResult?.totalBidsPlaced) || 0,
+    };
   }
 }

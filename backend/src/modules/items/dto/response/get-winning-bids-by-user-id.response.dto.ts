@@ -28,8 +28,8 @@ export class GetWinningBidsByUserIdResponseDto {
   readonly ownerId: Uuid;
 
   @ApiProperty({
-    example: 'Bao',
-    description: 'The name of the owner',
+    example: "Bao",
+    description: "The name of the owner",
   })
   readonly ownerName: string;
 
