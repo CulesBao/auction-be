@@ -6,7 +6,7 @@ import { join } from "path";
 
 @Injectable()
 export class MailerConfigService {
-  constructor(private readonly apiConfigService: ApiConfigService) {}
+  constructor(private readonly apiConfigService: ApiConfigService) { }
 
   mailerConfig(): MailerOptions {
     return {
@@ -20,7 +20,7 @@ export class MailerConfigService {
         },
       },
       defaults: {
-        from: this.apiConfigService.stmpConfig.from,
+        from: `Auction App <${this.apiConfigService.stmpConfig.from}>`,
       },
       template: {
         dir: join(process.cwd(), "src", "templates"),

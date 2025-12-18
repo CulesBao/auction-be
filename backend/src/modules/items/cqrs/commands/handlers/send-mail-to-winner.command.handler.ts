@@ -8,13 +8,12 @@ import { DataSource } from "typeorm";
 
 @CommandHandler(SendMailToWinnerCommand)
 export class SendMailToWinnerCommandHandler
-  implements ICommandHandler<SendMailToWinnerCommand>
-{
+  implements ICommandHandler<SendMailToWinnerCommand> {
   constructor(
     private readonly itemRepository: ItemRepository,
     private readonly queryBus: QueryBus,
     private readonly dataSource: DataSource,
-  ) {}
+  ) { }
 
   async execute(_: SendMailToWinnerCommand): Promise<void> {
     const now = new Date();
@@ -27,17 +26,23 @@ export class SendMailToWinnerCommandHandler
           const item = await manager.getRepository(ItemEntity).findOne({
             where: { id: rawItem.id },
             lock: { mode: "pessimistic_write" },
-            relations: { owner: true, winner: true },
           });
 
           if (!item) return;
 
+          const itemWithRelations = await manager.getRepository(ItemEntity).findOne({
+            where: { id: item.id },
+            relations: { owner: true, winner: true },
+          });
+
+          if (!itemWithRelations || !itemWithRelations.winner) return;
+
           this.queryBus.execute(
             new SendMailWithTemplate(
-              item.winner.email,
-              `Congratulations! You won the auction for "${item.name}"`,
+              itemWithRelations.winner.email,
+              `Congratulations! You won the auction for "${itemWithRelations.name}"`,
               "notify-to-winner.hbs",
-              { ...this.filterData(item) },
+              { ...this.filterData(itemWithRelations) },
             ),
           );
 
