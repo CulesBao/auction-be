@@ -28,6 +28,12 @@ export class GetWinningBidsByUserIdResponseDto {
   readonly ownerId: Uuid;
 
   @ApiProperty({
+    example: 'Bao',
+    description: 'The name of the owner',
+  })
+  readonly ownerName: string;
+
+  @ApiProperty({
     example: 100.0,
     description: "The starting price of the item",
   })
@@ -77,6 +83,7 @@ export class GetWinningBidsByUserIdResponseDto {
       name: entity.name,
       description: entity.description,
       ownerId: entity.ownerId,
+      ownerName: entity.owner.firstName + " " + entity.owner.lastName,
       startingPrice: entity.startingPrice,
       startTime: entity.startTime,
       endTime: entity.endTime,
