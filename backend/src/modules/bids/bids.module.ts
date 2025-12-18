@@ -7,8 +7,10 @@ import { BidEntity } from "./entities/bid.entity";
 import { CqrsModule } from "@nestjs/cqrs";
 import { UserModule } from "modules/user/user.module";
 import { ItemsModule } from "../items/items.module";
+import { GetMyBidsQueryHandler } from "./cqrs/queries/handlers/get-my-bids.query.handler";
 
 const commandsHandlers = [PlaceBidOnItemCommandHandler];
+const queriesHandlers = [GetMyBidsQueryHandler];
 
 @Module({
   imports: [
@@ -18,6 +20,6 @@ const commandsHandlers = [PlaceBidOnItemCommandHandler];
     ItemsModule,
   ],
   controllers: [BidsController],
-  providers: [...commandsHandlers, BidRepository],
+  providers: [...commandsHandlers, ...queriesHandlers, BidRepository],
 })
 export class BidsModule {}
