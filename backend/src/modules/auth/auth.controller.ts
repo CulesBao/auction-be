@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post } from "@nestjs/common";
+import { Body, Controller, Get, Post, Put } from "@nestjs/common";
 import { RegisterFormDto } from "./dto/register-form.dto";
 import {
   ApiBearerAuth,
@@ -17,6 +17,7 @@ import { RefreshTokenFormDto } from "./dto/refresh-token-form.dto";
 import { GoogleTokenFormDto } from "./dto/google-token-form.dto";
 import { AppleTokenFormDto } from "./dto/apple-token-form.dto";
 import { AppleAuthService } from "./apple-auth.service";
+import { UserChangePasswordFormDto } from "./dto/user-change-password-form.dto";
 
 @ApiTags("Auths")
 @Controller("auths")
@@ -41,6 +42,21 @@ export class AuthController {
   async login(@Body() loginDto: LoginFormDto): Promise<AuthResultDto> {
     return AuthResultDto.fromAuthResult(
       await this.authService.login(LoginFormDto.toLoginForm(loginDto)),
+    );
+  }
+
+  @Put("change-password")
+  @ApiBearerAuth()
+  @ApiOperation({ summary: "Change user's password" })
+  @ApiResponse({ status: 200, description: "Password changed successfully" })
+  @RequireLoggedIn()
+  async changePassword(
+    @AuthUser() user: UserEntity,
+    @Body() userChangePasswordFormDto: UserChangePasswordFormDto,
+  ): Promise<void> {
+    return await this.authService.changePassword(
+      user,
+      userChangePasswordFormDto,
     );
   }
 

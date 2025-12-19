@@ -6,6 +6,7 @@ import { KeycloakAdminClient } from "@s3pweb/keycloak-admin-client-cjs";
 import { LoginForm } from "../auth/domain/login-form";
 import axios, { AxiosError } from "axios";
 import { Token } from "../auth/domain/token";
+import { Uuid } from "common/types";
 
 @Injectable()
 export class KeycloakService implements OnModuleInit {
@@ -41,6 +42,17 @@ export class KeycloakService implements OnModuleInit {
                 temporary: false,
               },
             ],
+    });
+  }
+
+  async changePassword(keycloakId: Uuid, newPassword: string) {
+    await this.kcAdminClient.users.resetPassword({
+      id: keycloakId,
+      credential: {
+        type: "password",
+        value: newPassword,
+        temporary: false,
+      },
     });
   }
 

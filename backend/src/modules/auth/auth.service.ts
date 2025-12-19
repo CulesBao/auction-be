@@ -14,6 +14,7 @@ import { Token } from "./domain/token";
 import { Uuid } from "../../common/types";
 import { jwtDecode } from "jwt-decode";
 import { TokenPayload } from "./domain/token-payload";
+import { UserChangePasswordFormDto } from "./dto/user-change-password-form.dto";
 
 @Injectable()
 export class AuthService {
@@ -57,6 +58,36 @@ export class AuthService {
   async login(login: LoginForm): Promise<AuthResult> {
     return await this.createTokenForUser(
       await this.keycloakService.login(login),
+    );
+  }
+
+  async changePassword(
+    user: UserEntity,
+    userChangePasswordFormDto: UserChangePasswordFormDto,
+  ) {
+    await this.keycloakService.login({
+      email: user.email,
+      password: userChangePasswordFormDto.currentPassword,
+    });
+
+    if (!user.keyCloakId) {
+      throw new BadRequestException({
+        description: "User Keycloak ID is undefined.",
+      });
+    }
+
+    if (
+      userChangePasswordFormDto.newPassword !==
+      userChangePasswordFormDto.confirmNewPassword
+    ) {
+      throw new BadRequestException({
+        description: "New password and confirmation do not match.",
+      });
+    }
+
+    await this.keycloakService.changePassword(
+      user.keyCloakId,
+      userChangePasswordFormDto.newPassword,
     );
   }
 
