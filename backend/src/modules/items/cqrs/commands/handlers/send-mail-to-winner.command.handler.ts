@@ -5,6 +5,7 @@ import { ItemEntity } from "modules/items/entities/item.entity";
 import { QueryBus } from "@nestjs/cqrs";
 import { SendMailWithTemplate } from "modules/mail/cqrs/queries/implements/send-mail-with-template.query";
 import { DataSource } from "typeorm";
+import { Logger } from "@nestjs/common";
 
 @CommandHandler(SendMailToWinnerCommand)
 export class SendMailToWinnerCommandHandler
@@ -56,9 +57,7 @@ export class SendMailToWinnerCommandHandler
       ),
     );
 
-    console.log(
-      `[${now.toISOString()}] Sent ${rawItems.length} email(s) to winners.`,
-    );
+    Logger.log(`Sent ${rawItems.length} email(s) to winners.`);
   }
 
   private filterData(item: ItemEntity) {

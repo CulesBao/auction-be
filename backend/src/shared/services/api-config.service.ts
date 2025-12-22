@@ -47,6 +47,13 @@ export class ApiConfigService {
     };
   }
 
+  get s3Config() {
+    return {
+      supabaseUrl: this.getString("SUPABASE_URL"),
+      supabaseServiceRoleKey: this.getString("SUPABASE_SERVICE_ROLE_KEY"),
+    };
+  }
+
   get googleConfig() {
     return {
       clientIds: this.getStringArray("GOOGLE_CLIENT_IDS"),

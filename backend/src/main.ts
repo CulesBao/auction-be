@@ -1,5 +1,5 @@
 /* eslint-disable unicorn/prefer-top-level-await */
-import { RequestMethod, ValidationPipe } from "@nestjs/common";
+import { Logger, RequestMethod, ValidationPipe } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import { json, urlencoded } from "express";
 import { initializeTransactionalContext } from "typeorm-transactional";
@@ -36,7 +36,7 @@ async function bootstrap() {
 
   await app.listen(configService.serverPort);
 
-  console.info(`server running on ${await app.getUrl()}`);
+  Logger.log(`server running on ${await app.getUrl()}`);
 
   return app;
 }
