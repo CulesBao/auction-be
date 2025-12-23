@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from "@nestjs/common";
+import { Body, Controller, Get, Post, Query } from "@nestjs/common";
 import {
   ApiBearerAuth,
   ApiOperation,
@@ -9,14 +9,38 @@ import {
 import { GetPresignedUrlResponseDto } from "./dto/response/get-presigned-url.response.dto";
 import { AuthUser } from "decorator/auth-user.decorator";
 import { UserEntity } from "modules/user/entities/user.entity";
-import { QueryBus } from "@nestjs/cqrs";
+import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { GetPresignedUrlQuery } from "./cqrs/queries/implements/get-presigned-url.query";
 import { RequireLoggedIn } from "guards/role-container";
+import { CreateMediaResponseDto } from "./dto/response/create-media.response.dto";
+import { CreateMediaRequestDto } from "./dto/request/create-media.request.dto";
+import { MediaMapper } from "./mapper/media.mapper";
 
 @Controller("media")
 @ApiTags("Media")
 export class MediaController {
-  constructor(private readonly queryBus: QueryBus) {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
+
+  @Post("/")
+  @RequireLoggedIn()
+  @ApiOperation({ summary: "Upload media file" })
+  @ApiResponse({
+    status: 200,
+    description: "Media file uploaded successfully.",
+    type: CreateMediaResponseDto,
+  })
+  async createMedia(
+    @Body() createMediaRequestDto: CreateMediaRequestDto,
+  ): Promise<CreateMediaResponseDto> {
+    return CreateMediaResponseDto.fromDomain(
+      await this.commandBus.execute(
+        MediaMapper.fromCreateMediaRequestDto(createMediaRequestDto),
+      ),
+    );
+  }
 
   @Get("/presigned-url")
   @ApiBearerAuth()

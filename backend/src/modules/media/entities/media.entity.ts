@@ -11,6 +11,9 @@ export class MediaEntity extends AbstractEntity {
   readonly fileType: FileType;
 
   @Column()
+  readonly bucket: string;
+
+  @Column()
   readonly fileName: string;
 
   @Column()
