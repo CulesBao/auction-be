@@ -26,7 +26,7 @@ export class S3Adapter implements MediaAdapterInterface {
     request: GetPresignedUrlRequestDto,
   ): Promise<GetPresignedUrlResponseDto> {
     const fileName =
-      request.userId + crypto.randomUUID() + "_" + request.fileName;
+      request.userId + "/" + crypto.randomUUID() + "_" + request.fileName;
 
     const { data, error } = await this.client.storage
       .from(request.bucket)
@@ -44,5 +44,29 @@ export class S3Adapter implements MediaAdapterInterface {
       fileName,
       expiredAt: new Date(Date.now() + 60 * 1000),
     };
+  }
+
+  async fileExists(bucket: string, fileName: string): Promise<boolean> {
+    try {
+      const { data, error } = await this.client.storage
+        .from(bucket)
+        .exists(fileName);
+
+      if (error) {
+        Logger.error(`Error checking file existence: ${error.message}`);
+        return false;
+      }
+
+      return data;
+    } catch (error) {
+      Logger.error(`Failed to check file existence: ${error}`);
+      return false;
+    }
+  }
+
+  getPublicUrl(bucket: string, fileName: string): string {
+    const { data } = this.client.storage.from(bucket).getPublicUrl(fileName);
+
+    return data.publicUrl;
   }
 }

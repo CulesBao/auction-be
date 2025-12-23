@@ -1,10 +1,11 @@
-import { Column, Entity, OneToMany } from "typeorm";
+import { Column, Entity, ManyToOne, OneToMany } from "typeorm";
 import { Uuid } from "../../../common/types";
 import { Gender } from "../domain/gender";
 import { AbstractEntity } from "../../../common/abstract.entity";
 import { RoleType } from "../../../guards/role-type";
 import { ItemEntity } from "modules/items/entities/item.entity";
 import { BidEntity } from "modules/bids/entities/bid.entity";
+import { MediaEntity } from "modules/media/entities/media.entity";
 
 @Entity("users")
 export class UserEntity extends AbstractEntity {
@@ -19,6 +20,9 @@ export class UserEntity extends AbstractEntity {
 
   @Column({ nullable: true })
   picture?: string;
+
+  @ManyToOne(() => MediaEntity, { cascade: true })
+  avatar: MediaEntity | null;
 
   @Column({ unique: true })
   email: string;

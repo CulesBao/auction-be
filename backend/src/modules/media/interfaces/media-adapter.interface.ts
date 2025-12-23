@@ -11,4 +11,8 @@ export interface MediaAdapterInterface {
     expiredAt: Date;
     presignedUrl: string;
   }>;
+
+  fileExists(bucket: string, fileName: string): Promise<boolean>;
+
+  getPublicUrl(bucket: string, fileName: string): string;
 }
