@@ -22,5 +22,6 @@ const commandHandlers = [CreateMediaCommandHandler];
     { provide: MediaAdapterToken, useClass: S3Adapter },
   ],
   imports: [TypeOrmModule.forFeature([MediaEntity]), CqrsModule, S3Module],
+  exports: [MediaRepository],
 })
 export class MediaModule {}

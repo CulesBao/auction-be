@@ -38,6 +38,10 @@ export class UserRepository {
     return user;
   }
 
+  async update(userEntity: UserEntity): Promise<void> {
+    await this.userRepository.save(userEntity);
+  }
+
   async existBy(email: string): Promise<boolean> {
     return this.userRepository.existsBy({
       email,
