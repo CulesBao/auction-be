@@ -1,5 +1,10 @@
 import { Body, Controller, Put } from "@nestjs/common";
-import { ApiBearerAuth, ApiOperation, ApiResponse } from "@nestjs/swagger";
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from "@nestjs/swagger";
 import { AuthUser } from "decorator/auth-user.decorator";
 import { RequireLoggedIn } from "guards/role-container";
 import { UserEntity } from "./entities/user.entity";
@@ -8,6 +13,7 @@ import { CommandBus } from "@nestjs/cqrs";
 import { UpdateUser } from "./domain/update-user";
 
 @Controller("users")
+@ApiTags("Users")
 export class UserController {
   constructor(private readonly commandBus: CommandBus) {}
 

@@ -2,6 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Uuid } from "common/types";
 import { ItemEntity } from "../../entities/item.entity";
 import { BidEntity } from "modules/bids/entities/bid.entity";
+import { MediaEntity } from "modules/media/entities/media.entity";
 
 class BidHistoryDto {
   @ApiProperty({
@@ -49,6 +50,38 @@ class BidHistoryDto {
   }
 }
 
+export class MediaDto {
+  @ApiProperty({
+    example: "550e8400-e29b-41d4-a716-446655440000",
+    description: "The unique identifier of the media",
+  })
+  id: Uuid;
+
+  @ApiProperty({
+    example: "image12345.png",
+    description: "The file name of the media",
+  })
+  fileName: string;
+
+  @ApiProperty({
+    example: "https://bucket-name.s3.amazonaws.com/image12345.png",
+    description: "The URL of the media file",
+  })
+  fileUrl: string;
+
+  static fromEntity(entity: MediaEntity): MediaDto {
+    return {
+      id: entity.id,
+      fileName: entity.fileName,
+      fileUrl: entity.fileUrl,
+    };
+  }
+
+  static fromEntities(entities: MediaEntity[]): MediaDto[] {
+    return entities.map((entity) => this.fromEntity(entity));
+  }
+}
+
 export class GetItemByIdResponseDto {
   @ApiProperty({
     example: "550e8400-e29b-41d4-a716-446655440000",
@@ -73,6 +106,18 @@ export class GetItemByIdResponseDto {
     description: "The unique identifier of the owner",
   })
   readonly ownerId: Uuid;
+
+  @ApiProperty({
+    example: [
+      {
+        id: "550e8400-e29b-41d4-a716-446655440000",
+        fileName: "image12345.png",
+        fileUrl: "https://bucket-name.s3.amazonaws.com/image12345.png",
+      },
+    ],
+    description: "The media files associated with the item",
+  })
+  readonly medias: MediaDto[];
 
   @ApiProperty({
     example: "Bao Duong",
@@ -140,6 +185,7 @@ export class GetItemByIdResponseDto {
       name: entity.name,
       description: entity.description,
       ownerId: entity.ownerId,
+      medias: MediaDto.fromEntities(entity.medias),
       ownerName: entity.owner.firstName + " " + entity.owner.lastName,
       startingPrice: entity.startingPrice,
       startTime: entity.startTime,

@@ -51,7 +51,7 @@ export class CurrentUserDto {
       firstName: user.firstName,
       lastName: user.lastName,
       fullName: `${user.firstName} ${user.lastName}`,
-      avatarId: user.avatarId,
+      avatarId: user.avatar?.id || null,
       picture: user.picture,
       gender: user.gender,
       role: user.role,

@@ -42,6 +42,7 @@ export class ItemRepository {
         bids: {
           user: true,
         },
+        medias: true,
       },
     });
 

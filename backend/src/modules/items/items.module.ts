@@ -19,6 +19,7 @@ import { SendMailToWinnerSchedule } from "./schedules/send-mail-to-winner.schedu
 import { SendMailToWinnerCommandHandler } from "./cqrs/commands/handlers/send-mail-to-winner.command.handler";
 import { GetItemsByFilterQueryHandler } from "./cqrs/queries/handlers/get-items-by-filter.query.handler";
 import { GetStatisticByUserIdQueryHandler } from "./cqrs/queries/handlers/get-statistic-by-user-id.query.handler";
+import { MediaModule } from "modules/media/media.module";
 
 const commandHandlers = [
   CreateItemCommandHandler,
@@ -39,7 +40,12 @@ const queryHandlers = [
 ];
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ItemEntity]), CqrsModule, UserModule],
+  imports: [
+    TypeOrmModule.forFeature([ItemEntity]),
+    CqrsModule,
+    UserModule,
+    MediaModule,
+  ],
   controllers: [ItemsController],
   providers: [
     ItemRepository,

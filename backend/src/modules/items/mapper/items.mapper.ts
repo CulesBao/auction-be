@@ -11,6 +11,7 @@ export class ItemsMapper {
     return new CreateItemCommand(
       dto.name,
       dto.description,
+      dto.mediaIds,
       ownerId,
       dto.startingPrice,
       dto.startTime,

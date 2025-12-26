@@ -1,11 +1,13 @@
 import { ApiProperty } from "@nestjs/swagger";
 import {
+  IsArray,
   IsDateString,
   IsNotEmpty,
   IsNumber,
   IsPositive,
   IsString,
 } from "class-validator";
+import { Uuid } from "common/types";
 
 export class CreateItemRequestDto {
   @ApiProperty({
@@ -24,6 +26,15 @@ export class CreateItemRequestDto {
   })
   @IsString()
   description: string;
+
+  @ApiProperty({
+    example: ["uuid1", "uuid2"],
+    description: "Array of media IDs associated with the item",
+    required: true,
+  })
+  @IsArray()
+  @IsNotEmpty({ each: true })
+  mediaIds: Uuid[];
 
   @ApiProperty({
     example: 100,

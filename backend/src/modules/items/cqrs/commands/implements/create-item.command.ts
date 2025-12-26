@@ -5,6 +5,7 @@ export class CreateItemCommand implements ICommand {
   constructor(
     public readonly name: string,
     public readonly description: string,
+    public readonly mediaIds: Uuid[],
     public readonly ownerId: Uuid,
     public readonly startingPrice: number,
     public readonly startTime: Date,

@@ -3,11 +3,14 @@ import { UserEntity } from "modules/user/entities/user.entity";
 import {
   Column,
   Entity,
+  JoinTable,
+  ManyToMany,
   ManyToOne,
   OneToMany,
   PrimaryGeneratedColumn,
 } from "typeorm";
 import { BidEntity } from "../../bids/entities/bid.entity";
+import { MediaEntity } from "modules/media/entities/media.entity";
 
 @Entity("items")
 export class ItemEntity {
@@ -25,6 +28,10 @@ export class ItemEntity {
 
   @Column({ type: "uuid" })
   ownerId: Uuid;
+
+  @ManyToMany(() => MediaEntity)
+  @JoinTable({ name: "item_medias" })
+  medias: MediaEntity[];
 
   @Column({ nullable: false, type: "decimal" })
   startingPrice: number;

@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { MediaEntity } from "../entities/media.entity";
-import { Repository } from "typeorm";
+import { In, Repository } from "typeorm";
 import { Uuid } from "common/types";
 
 @Injectable()
@@ -25,5 +25,11 @@ export class MediaRepository {
     }
 
     return mediaEntity;
+  }
+
+  async findByIds(ids: Uuid[]): Promise<MediaEntity[]> {
+    return this.mediaRepository.findBy({
+      id: In(ids),
+    });
   }
 }
