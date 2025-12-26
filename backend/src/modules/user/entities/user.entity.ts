@@ -21,6 +21,9 @@ export class UserEntity extends AbstractEntity {
   @Column({ nullable: true })
   picture?: string;
 
+  @Column()
+  avatarId: Uuid | null;
+
   @ManyToOne(() => MediaEntity, { cascade: true })
   avatar: MediaEntity | null;
 

@@ -5,12 +5,11 @@ import { MediaRepository } from "modules/media/repository/media.repository";
 
 @CommandHandler(UpdateUserCommand)
 export class UpdateUserCommandHandler
-  implements ICommandHandler<UpdateUserCommand>
-{
+  implements ICommandHandler<UpdateUserCommand> {
   constructor(
     private readonly userRepository: UserRepository,
     private readonly mediaRepository: MediaRepository,
-  ) {}
+  ) { }
 
   async execute(updateUserCommand: UpdateUserCommand): Promise<void> {
     const mediaEntity = updateUserCommand.avatarId
@@ -21,6 +20,7 @@ export class UpdateUserCommandHandler
       ...updateUserCommand.userEntity,
       avatar: mediaEntity,
       picture: mediaEntity?.fileUrl || undefined,
+      avatarId: mediaEntity?.id || null,
       firstName: updateUserCommand.firstName,
       lastName: updateUserCommand.lastName,
       birthday: updateUserCommand.birthday || undefined,

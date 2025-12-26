@@ -21,6 +21,9 @@ export class CurrentUserDto {
   picture?: string;
 
   @ApiProperty()
+  avatarId: Uuid | null;
+
+  @ApiProperty()
   fullName: string;
 
   @ApiProperty()
@@ -48,6 +51,7 @@ export class CurrentUserDto {
       firstName: user.firstName,
       lastName: user.lastName,
       fullName: `${user.firstName} ${user.lastName}`,
+      avatarId: user.avatarId,
       picture: user.picture,
       gender: user.gender,
       role: user.role,
