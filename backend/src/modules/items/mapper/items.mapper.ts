@@ -28,6 +28,7 @@ export class ItemsMapper {
       id,
       dto.name,
       dto.description,
+      dto.mediaIds,
       dto.startingPrice,
       dto.startTime,
       dto.endTime,

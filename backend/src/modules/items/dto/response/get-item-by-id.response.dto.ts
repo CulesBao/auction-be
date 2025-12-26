@@ -30,6 +30,12 @@ class BidHistoryDto {
   readonly userId: Uuid;
 
   @ApiProperty({
+    example: "https://example.com/user-avatar.png",
+    description: "The avatar URL of the user who placed the bid",
+  })
+  readonly userPicture?: string;
+
+  @ApiProperty({
     example: "Le Thi B",
     description: "The name of the user who placed the bid",
   })
@@ -41,6 +47,7 @@ class BidHistoryDto {
       price: entity.price,
       createdAt: entity.createdAt,
       userId: entity.userId,
+      userPicture: entity.user.picture,
       userName: entity.user.firstName + " " + entity.user.lastName,
     };
   }

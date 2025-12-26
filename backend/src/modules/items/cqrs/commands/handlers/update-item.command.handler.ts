@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from "@nestjs/common";
 import { ItemRepository } from "modules/items/repository/item.repository";
+import { MediaRepository } from "modules/media/repository/media.repository";
 
 @CommandHandler(UpdateItemCommand)
 export class UpdateItemCommandHandler
@@ -14,6 +15,8 @@ export class UpdateItemCommandHandler
   constructor(
     @Inject(ItemRepository)
     private readonly itemRepository: ItemRepository,
+    @Inject(MediaRepository)
+    private readonly mediaRepository: MediaRepository,
   ) {}
 
   async execute(command: UpdateItemCommand): Promise<void> {
@@ -31,12 +34,16 @@ export class UpdateItemCommandHandler
       });
     }
 
-    await this.itemRepository.update(command.id, {
+    const medias = await this.mediaRepository.findByIds(command.mediaIds);
+
+    await this.itemRepository.update({
+      ...item,
       name: command.name,
       description: command.description,
       startingPrice: command.startingPrice,
       startTime: command.startTime,
       endTime: command.endTime,
+      medias: medias,
     });
   }
 }

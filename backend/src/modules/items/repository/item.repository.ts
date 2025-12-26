@@ -64,8 +64,8 @@ export class ItemRepository {
     });
   }
 
-  async update(id: Uuid, updateData: Partial<ItemEntity>): Promise<void> {
-    await this.itemRepository.update(id, updateData);
+  async update(itemEntity: ItemEntity): Promise<void> {
+    await this.itemRepository.save(itemEntity);
   }
 
   async findNonBiddedItems(

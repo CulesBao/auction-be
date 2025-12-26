@@ -6,6 +6,7 @@ export class UpdateItemCommand implements ICommand {
     public readonly id: Uuid,
     public readonly name: string,
     public readonly description: string,
+    public readonly mediaIds: Uuid[],
     public readonly startingPrice: number,
     public readonly startTime: Date,
     public readonly endTime: Date,
