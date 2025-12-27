@@ -31,6 +31,7 @@ import { MailModule } from "./modules/mail/mail.module";
 import { ScheduleModule } from "@nestjs/schedule";
 import { MediaModule } from "./modules/media/media.module";
 import { S3Module } from "modules/s3/s3.module";
+import { MediaServiceModule } from "./modules/media-service/media-service.module";
 
 @Module({
   imports: [
@@ -81,6 +82,7 @@ import { S3Module } from "modules/s3/s3.module";
     ScheduleModule.forRoot(),
     MediaModule,
     S3Module,
+    MediaServiceModule,
   ],
   providers: [
     {

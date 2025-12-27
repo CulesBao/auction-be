@@ -28,7 +28,7 @@ async function bootstrap() {
     },
   });
 
-  app.setGlobalPrefix("api/v1", {
+  app.setGlobalPrefix("auction-service/api/v1", {
     exclude: [{ path: "health", method: RequestMethod.GET }],
   });
 
@@ -49,6 +49,7 @@ async function bootstrap() {
   configureSwagger(app, configService);
   configLogging(app, configService);
 
+  await app.startAllMicroservices();
   await app.listen(configService.serverPort);
 
   Logger.log(`server running on ${await app.getUrl()}`);

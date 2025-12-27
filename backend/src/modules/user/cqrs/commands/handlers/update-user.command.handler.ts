@@ -1,7 +1,11 @@
 import { CommandHandler, ICommandHandler } from "@nestjs/cqrs";
 import { UpdateUserCommand } from "../implements/update-user.command";
 import { UserRepository } from "modules/user/repository/user.repository";
-import { MediaRepository } from "modules/media/repository/media.repository";
+import { Inject } from "@nestjs/common";
+import { ClientProxy } from "@nestjs/microservices";
+import { firstValueFrom } from "rxjs";
+import { MediaDto } from "modules/items/dto/response/get-item-by-id.response.dto";
+import { MediaService } from "modules/media-service/media-service.token";
 
 @CommandHandler(UpdateUserCommand)
 export class UpdateUserCommandHandler
@@ -9,18 +13,21 @@ export class UpdateUserCommandHandler
 {
   constructor(
     private readonly userRepository: UserRepository,
-    private readonly mediaRepository: MediaRepository,
+    @Inject(MediaService.name)
+    private readonly client: ClientProxy,
   ) {}
 
   async execute(updateUserCommand: UpdateUserCommand): Promise<void> {
-    const mediaEntity = updateUserCommand.avatarId
-      ? await this.mediaRepository.findByIdOrThrow(updateUserCommand.avatarId)
-      : null;
+    const media = await firstValueFrom(
+      this.client.send<MediaDto[]>(
+        MediaService.getByIds,
+        updateUserCommand.avatarId,
+      ),
+    );
 
     await this.userRepository.update({
       ...updateUserCommand.userEntity,
-      avatar: mediaEntity,
-      picture: mediaEntity?.fileUrl || undefined,
+      picture: media[0]?.fileUrl || undefined,
       firstName: updateUserCommand.firstName,
       lastName: updateUserCommand.lastName,
       birthday: updateUserCommand.birthday || undefined,
