@@ -2,7 +2,7 @@ import { ApiProperty } from "@nestjs/swagger";
 import { Uuid } from "common/types";
 import { ItemEntity } from "../../entities/item.entity";
 import { BidEntity } from "modules/bids/entities/bid.entity";
-import { MediaEntity } from "modules/media/entities/media.entity";
+import { MediaDto } from "modules/media-service/dto/media.dto";
 
 class BidHistoryDto {
   @ApiProperty({
@@ -53,38 +53,6 @@ class BidHistoryDto {
   }
 
   static fromEntities(entities: BidEntity[]): BidHistoryDto[] {
-    return entities.map((entity) => this.fromEntity(entity));
-  }
-}
-
-export class MediaDto {
-  @ApiProperty({
-    example: "550e8400-e29b-41d4-a716-446655440000",
-    description: "The unique identifier of the media",
-  })
-  id: Uuid;
-
-  @ApiProperty({
-    example: "image12345.png",
-    description: "The file name of the media",
-  })
-  fileName: string;
-
-  @ApiProperty({
-    example: "https://bucket-name.s3.amazonaws.com/image12345.png",
-    description: "The URL of the media file",
-  })
-  fileUrl: string;
-
-  static fromEntity(entity: MediaEntity): MediaDto {
-    return {
-      id: entity.id,
-      fileName: entity.fileName,
-      fileUrl: entity.fileUrl,
-    };
-  }
-
-  static fromEntities(entities: MediaEntity[]): MediaDto[] {
     return entities.map((entity) => this.fromEntity(entity));
   }
 }
@@ -186,13 +154,16 @@ export class GetItemByIdResponseDto {
   })
   readonly updatedAt: Date;
 
-  static fromEntity(entity: ItemEntity): GetItemByIdResponseDto {
+  static fromEntity(
+    entity: ItemEntity,
+    medias: MediaDto[],
+  ): GetItemByIdResponseDto {
     return {
       id: entity.id,
       name: entity.name,
       description: entity.description,
       ownerId: entity.ownerId,
-      medias: MediaDto.fromEntities(entity.medias),
+      medias: medias,
       ownerName: entity.owner.firstName + " " + entity.owner.lastName,
       startingPrice: entity.startingPrice,
       startTime: entity.startTime,

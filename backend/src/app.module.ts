@@ -29,8 +29,6 @@ import { MailerModule } from "@nestjs-modules/mailer";
 import { MailerConfigService } from "shared/services/mailer-config.service";
 import { MailModule } from "./modules/mail/mail.module";
 import { ScheduleModule } from "@nestjs/schedule";
-import { MediaModule } from "./modules/media/media.module";
-import { S3Module } from "modules/s3/s3.module";
 import { MediaServiceModule } from "./modules/media-service/media-service.module";
 
 @Module({
@@ -80,8 +78,6 @@ import { MediaServiceModule } from "./modules/media-service/media-service.module
     }),
     MailModule,
     ScheduleModule.forRoot(),
-    MediaModule,
-    S3Module,
     MediaServiceModule,
   ],
   providers: [
