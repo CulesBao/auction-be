@@ -8,7 +8,10 @@ import { PassportModule } from "@nestjs/passport";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import { DataSource } from "typeorm";
-import { addTransactionalDataSource } from "typeorm-transactional";
+import {
+  addTransactionalDataSource,
+  getDataSourceByName,
+} from "typeorm-transactional";
 import { CqrsModule } from "@nestjs/cqrs";
 import { TypeOrmConfigService } from "./database/typeorm-config.service";
 import { JwtAuthGuard } from "./decorator/jwt-auth-guard";
@@ -45,14 +48,18 @@ import { S3Module } from "modules/s3/s3.module";
       imports: [SharedModule],
       useClass: TypeOrmConfigService,
       inject: [ApiConfigService],
-      dataSourceFactory: (options) => {
+      dataSourceFactory: async (options) => {
         if (!options) {
           throw new Error("Invalid options passed");
         }
 
-        return Promise.resolve(
-          addTransactionalDataSource(new DataSource(options)),
-        );
+        const existingDataSource = getDataSourceByName("default");
+        if (existingDataSource && existingDataSource.isInitialized) {
+          return existingDataSource;
+        }
+
+        const dataSource = new DataSource(options);
+        return addTransactionalDataSource(dataSource);
       },
     }),
     HttpModule.register({

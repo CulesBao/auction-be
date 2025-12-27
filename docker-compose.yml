@@ -30,6 +30,16 @@ services:
     ports:
       - "$DB_PORT:$DB_PORT"
 
+  rabbitmq:
+    image: rabbitmq:4.2-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: $RABBITMQ_DEFAULT_USER
+      RABBITMQ_DEFAULT_PASS: $RABBITMQ_DEFAULT_PASS
+
   keycloak:
     image: quay.io/keycloak/keycloak:latest
     container_name: keycloak

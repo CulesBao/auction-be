@@ -9,10 +9,24 @@ import { configLogging } from "./configuration/config-logging";
 import { configureSwagger } from "./configuration/config-swagger";
 import { ApiConfigService } from "./shared/services/api-config.service";
 import { SharedModule } from "./shared/shared.module";
+import { MicroserviceOptions, Transport } from "@nestjs/microservices";
 
 async function bootstrap() {
   initializeTransactionalContext();
   const app = await NestFactory.create(AppModule);
+
+  const configService = app.select(SharedModule).get(ApiConfigService);
+
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.RMQ,
+    options: {
+      urls: [configService.rabbitMqUrl],
+      queue: "auction_queue",
+      queueOptions: {
+        durable: false,
+      },
+    },
+  });
 
   app.setGlobalPrefix("api/v1", {
     exclude: [{ path: "health", method: RequestMethod.GET }],
@@ -31,8 +45,6 @@ async function bootstrap() {
 
   app.use(json({ limit: "10mb" }));
   app.use(urlencoded({ extended: true, limit: "10mb" }));
-
-  const configService = app.select(SharedModule).get(ApiConfigService);
 
   configureSwagger(app, configService);
   configLogging(app, configService);

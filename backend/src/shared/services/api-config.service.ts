@@ -107,6 +107,10 @@ export class ApiConfigService {
     return this.getString("NODE_ENV");
   }
 
+  get rabbitMqUrl(): string {
+    return this.getString("RABBITMQ_URL");
+  }
+
   private getStringArray(key: string): string[] {
     const value = this.get(key);
     if (!value) {
